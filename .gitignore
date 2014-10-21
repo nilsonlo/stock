@@ -1,0 +1,7 @@
+*.CSV
+*.ini
+*.txt
+log/
+schema/
+PushBullet/
+bak/
