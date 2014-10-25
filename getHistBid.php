@@ -98,8 +98,17 @@ try
 		}
 		unset($warrant_data);
 
-		$url = "http://www.warrantwin.com.tw/ws/NewWarSearch.aspx?showType=basic_123&p=CPCode,Derivative,Broker,Conver,Lever,S_BuyIV,E_BuyIV,Sp,Ep,S_Period,E_Period,BuySellRate,PageSize,PageNo,listCode,Amt,Vol&v=7,ALL,ALL,ALL,ALL,,,-10000,10000,,,ALL,8000,1,".$stockItem['stock_id'].",ALL,ALL";
-		$output = GetWebService($url,array('iDisplayStart'=>0,'iDisplayLength'=>200));
+		$url = "https://www.warrantwin.com.tw/ws/NewWarSearch.aspx?showType=basic_123&p=CPCode,Derivative,Broker,Conver,Lever,S_BuyIV,E_BuyIV,Sp,Ep,S_Period,E_Period,BuySellRate,PageSize,PageNo,listCode,Amt,Vol&v=7,ALL,ALL,ALL,ALL,,,-10000,10000,,,ALL,8000,1,".$stockItem['stock_id'].",ALL,ALL";
+		$formData = array('sEcho'=>1,'iColumns'=>17,'sColumns'=>'','iDisplayStart'=>0,'iDisplayLength'=>200,
+			'mDataProp_0'=>0,'mDataProp_1'=>1,'mDataProp_2'=>2,'mDataProp_3'=>3,'mDataProp_4'=>4,
+			'mDataProp_5'=>5,'mDataProp_6'=>6,'mDataProp_7'=>7,'mDataProp_8'=>8,'mDataProp_9'=>9,
+			'mDataProp_10'=>10,'mDataProp_11'=>11,'mDataProp_12'=>12,'mDataProp_13'=>13,'mDataProp_14'=>14,
+			'mDataProp_15'=>15,'mDataProp_16'=>16,'iSortingCols'=>0,'bSortable_0'=>true,'bSortable_1'=>true,
+			'bSortable_2'=>true,'bSortable_3'=>true,'bSortable_4'=>true,'bSortable_5'=>true,'bSortable_6'=>true,
+			'bSortable_7'=>true,'bSortable_8'=>true,'bSortable_9'=>true,'bSortable_10'=>true,'bSortable_11'=>true,
+			'bSortable_12'=>true,'bSortable_13'=>true,'bSortable_14'=>true,'bSortable_15'=>true,'bSortable_16'=>true,
+			);
+		$output = GetWebService($url,$formData);
 		$warrant_obj = json_decode($output);
 		if($warrant_obj->iTotalRecords == 0 || !isset($warrant_obj->aaData))
 		{
