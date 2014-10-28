@@ -62,45 +62,67 @@ function CheckStockInfo($dbh,$stock_id,$days)
         }
 }
 
-function CheckWarrantData($dbh,$stock_id,$days)
+function CheckWarrantData($dbh)
 {
 	try {
                 # 錯誤的話, 就不做了
                 $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
 		# check stock info data
-		$p = $dbh->prepare("select * from `warrant_data` where stock_id=:stock_id limit 1");
-		$p->execute(array('stock_id'=>$stock_id));
+		$p = $dbh->prepare("select count(*) as num from `warrant_data` where warrant_name is null");
+		$p2 = $dbh->prepare("select count(*) as num from `warrant_data` where warrant_name is not null");
+		$p->execute();
 		if($p->rowCount() === 0)
 		{
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No Exists Stock : '. $stock_id .
-					' in '. $days . "\n",3,'./log/valid.log');
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No Exists Stock : '. $stock_id .
-					' in '. $days . "\n");
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist warrant is null records'.
+					"\n",3,'./log/valid.log');
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist warrant is null records'.
+					"\n");
 			return -1;
 		}
 		$item = $p->fetch(PDO::FETCH_ASSOC);
-		if(!isset($item['updated_at']))
+		if(!isset($item['num']))
 		{
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Stock : '. $stock_id .
-					' in '. $days . ' warrant updated_at unset!' . "\n",3,'./log/valid.log');
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Stock : '. $stock_id .
-					' in '. $days . ' warrant updated_at unset!' . "\n");
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist specific column to fetch'.
+					"\n",3,'./log/valid.log');
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist specific column to fetch'.
+					"\n");
 			return -2;
 		}
-		$num = $item['updated_at'];
-		if($days !== $num)
+		$num = intval($item['num']);
+		unset($item);
+		$p2->execute();
+		if($p2->rowCount() === 0)
 		{
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Stock : '. $stock_id .
-					' in '. $days . ' no warrant match the day : ' . $num . "\n",3,'./log/valid.log');
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Stock : '. $stock_id .
-					' in '. $days . ' no warrant match the day : ' . $num . "\n");
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist warrant is not null records'.
+					"\n",3,'./log/valid.log');
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist warrant is not null records'.
+					"\n");
 			return -3;
+		}
+		$item = $p->fetch(PDO::FETCH_ASSOC);
+		if(!isset($item['num']))
+		{
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist specific column to fetch'.
+					"\n",3,'./log/valid.log');
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist specific column to fetch'.
+					"\n");
+			return -4;
+		}
+		$num2 = intval($item['num']);
+		unset($item);
+		if($num >= $num2)
+		{
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' warrant data parser may be wrong'.
+					$num.'<->'.$num2 ."\n",3,'./log/valid.log');
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' warrant data parser may be wrong'.
+					$num.'<->'.$num2 ."\n");
+			return -5;
 		}
 		return 0;
         } catch (PDOException $e) {
 		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Error : ('.$e->getLine().') '.$e->getMessage()."\n",3,'./log/valid.log');
 		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Error : ('.$e->getLine().') '.$e->getMessage()."\n");
-		return -4;
+		return -6;
         }
 }
 
@@ -139,22 +161,6 @@ switch($ret)
 	default:
 		break;
 }
-$ret = CheckWarrantData($dbh,'2002',$days);
-switch($ret)
-{
-	case -1:
-		$notify->pushNote($title,"抓取上市股票的權證資料有誤");
-		break;
-	case -2:
-	case -3:
-		$notify->pushNote($title,"抓取上市股票的權證資料日期不一致");
-		break;
-	case -4:
-		$notify->pushNote($title,"抓取上市股票的權證資料有誤");
-		break;
-	default:
-		break;
-}
 # 上櫃挑一間檢查
 $ret = CheckStockInfo($dbh,'3227',$days);
 switch($ret)
@@ -176,18 +182,12 @@ switch($ret)
 	default:
 		break;
 }
-$ret = CheckWarrantData($dbh,'3227',$days);
+
+$ret = CheckWarrantData($dbh);
 switch($ret)
 {
-	case -1:
-		$notify->pushNote($title,"抓取上櫃股票的權證資料有誤");
-		break;
-	case -2:
-	case -3:
-		$notify->pushNote($title,"抓取上櫃股票的權證資料日期不一致");
-		break;
-	case -4:
-		$notify->pushNote($title,"抓取上櫃股票的權證資料有誤");
+	case -5:
+		$notify->pushNote($title,"抓取股票的權證資料有誤");
 		break;
 	default:
 		break;

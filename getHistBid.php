@@ -48,10 +48,9 @@ try
 	# 錯誤的話, 就不做了
 	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
 	$p1 = $dbh->prepare("select stock_id,twse_stock_id from stock_info");
-	$p2 = $dbh->prepare("insert into `warrant_data` (`stock_id`,`warrant_id`,`warrant_iv`,`warrant_type`,`stock_type`,
-		`updated_at`) values (:stock_id,:warrant_id,:warrant_iv,:warrant_type,:stock_type,:updated_at) 
-		on duplicate key update warrant_iv=:warrant_iv,warrant_type=:warrant_type,stock_type=:stock_type,
-		updated_at=:updated_at");
+	$p2 = $dbh->prepare("insert into `warrant_data` (`stock_id`,`warrant_id`,`warrant_iv`,`warrant_type`,`stock_type`)
+		values (:stock_id,:warrant_id,:warrant_iv,:warrant_type,:stock_type) 
+		on duplicate key update warrant_iv=:warrant_iv,warrant_type=:warrant_type,stock_type=:stock_type");
 	$p3 = $dbh->prepare("insert into `warrant_data` (`stock_id`,`warrant_id`,`warrant_name`,`warrant_type`,`warrant_strike`,
 		`warrant_days`,`warrant_multi`,`stock_type`,`updated_at`) values (:stock_id,:warrant_id,:warrant_name,
 		:warrant_type,:warrant_strike,:warrant_days,:warrant_multi,:stock_type,:updated_at) on duplicate key update
@@ -92,7 +91,6 @@ try
 					'warrant_iv'=>$biv,
 					'warrant_type'=>$warrant_type,
 					'stock_type'=>$stock_type,
-					'updated_at'=>$current_date->format("Ymd"),
 					));
 			}
 		}
