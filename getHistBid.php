@@ -80,6 +80,7 @@ try
 			$tmpArray = array();
 			foreach($item->bivs as $bivObj)
 			{
+				if($item->bivs == '-') continue;
 				$tmpArray[] = $bivObj->biv;
 			}
 			$biv = array_median($tmpArray);
