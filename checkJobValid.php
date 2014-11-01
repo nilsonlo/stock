@@ -63,11 +63,11 @@ $ret = CheckHistoryData($dbh,'2002',$days);
 switch($ret)
 {
 	case -1:
-		$notify->pushNote($title,"抓取上市股票資料有誤");
+		$notify->pushNote($title,"抓取上市股票資料有誤 ".$ret);
 		break;
 	case -2:
 	case -3:
-		$notify->pushNote($title,"抓取上市公司資料有誤");
+		$notify->pushNote($title,"抓取上市公司資料有誤 ".$ret);
 		break;
 	default:
 		break;
@@ -77,11 +77,11 @@ $ret = CheckHistoryData($dbh,'3227',$days);
 switch($ret)
 {
 	case -1:
-		$notify->pushNote($title,"抓取上櫃股票資料有誤");
+		$notify->pushNote($title,"抓取上櫃股票資料有誤 ".$ret);
 		break;
 	case -2:
 	case -3:
-		$notify->pushNote($title,"抓取上櫃公司資料有誤");
+		$notify->pushNote($title,"抓取上櫃公司資料有誤 ".$ret);
 		break;
 	default:
 		break;

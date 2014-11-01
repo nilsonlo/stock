@@ -102,9 +102,9 @@ function CheckWarrantData($dbh)
 		$item = $p->fetch(PDO::FETCH_ASSOC);
 		if(!isset($item['num']))
 		{
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist specific column to fetch'.
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist specific column to fetch (not null)'.
 					"\n",3,'./log/valid.log');
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist specific column to fetch'.
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist specific column to fetch (not null)'.
 					"\n");
 			return -4;
 		}
@@ -166,18 +166,18 @@ $ret = CheckStockInfo($dbh,'3227',$days);
 switch($ret)
 {
 	case -1:
-		$notify->pushNote($title,"統計上櫃股票資料有誤");
+		$notify->pushNote($title,"統計上櫃股票資料有誤 ".$ret);
 		break;
 	case -2:
 	case -3:
-		$notify->pushNote($title,"統計上櫃股票市值資料有誤");
+		$notify->pushNote($title,"統計上櫃股票市值資料有誤 ".$ret);
 		break;
 	case -4:
 	case -5:
-		$notify->pushNote($title,"統計上櫃股票資料日期不一致");
+		$notify->pushNote($title,"統計上櫃股票資料日期不一致 ".$ret);
 		break;
 	case -6:
-		$notify->pushNote($title,"統計上櫃公司資料有誤");
+		$notify->pushNote($title,"統計上櫃公司資料有誤 ".$ret);
 		break;
 	default:
 		break;
@@ -187,9 +187,10 @@ $ret = CheckWarrantData($dbh);
 switch($ret)
 {
 	case -5:
-		$notify->pushNote($title,"抓取股票的權證資料有誤");
+		$notify->pushNote($title,"抓取權證資料有誤 ".$ret);
 		break;
 	default:
+		$notify->pushNote($title,"抓取權證資料有誤 ".$ret);
 		break;
 }
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Finish'."\n",3,'./log/valid.log');
