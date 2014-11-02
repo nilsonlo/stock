@@ -48,15 +48,16 @@ try
 	# 錯誤的話, 就不做了
 	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
 	$p1 = $dbh->prepare("select stock_id,twse_stock_id from stock_info");
-	$p2 = $dbh->prepare("insert into `warrant_data` (`stock_id`,`warrant_id`,`warrant_iv`,`warrant_type`,`stock_type`)
-		values (:stock_id,:warrant_id,:warrant_iv,:warrant_type,:stock_type) 
+	$p2 = $dbh->prepare("insert into `warrant_data` (`stock_id`,`warrant_id`,`warrant_iv`,`warrant_type`,
+		`stock_type`) values (:stock_id,:warrant_id,:warrant_iv,:warrant_type,:stock_type) 
 		on duplicate key update warrant_iv=:warrant_iv,warrant_type=:warrant_type,stock_type=:stock_type");
-	$p3 = $dbh->prepare("insert into `warrant_data` (`stock_id`,`warrant_id`,`warrant_name`,`warrant_type`,`warrant_strike`,
-		`warrant_days`,`warrant_multi`,`stock_type`,`updated_at`) values (:stock_id,:warrant_id,:warrant_name,
-		:warrant_type,:warrant_strike,:warrant_days,:warrant_multi,:stock_type,:updated_at) on duplicate key update
-		warrant_name=:warrant_name,warrant_type=:warrant_type,warrant_strike=:warrant_strike,warrant_days=:warrant_days,
+	$p3 = $dbh->prepare("insert into `warrant_data` (`stock_id`,`warrant_id`,`warrant_name`,`stock_name`,
+		`warrant_type`,`warrant_strike`,`warrant_days`,`warrant_multi`,`stock_type`,`updated_at`) values 
+		(:stock_id,:warrant_id,:warrant_name,:stock_name,:warrant_type,:warrant_strike,:warrant_days,
+		:warrant_multi,:stock_type,:updated_at) on duplicate key update warrant_name=:warrant_name,
+		stock_name=:stock_name,warrant_type=:warrant_type,warrant_strike=:warrant_strike,warrant_days=:warrant_days,
 		warrant_multi=:warrant_multi,stock_type=:stock_type,updated_at=:updated_at");
-	$p4 = $dbh->prepare("delete from `warrant_data`");
+	$p4 = $dbh->prepare("delete from warrant_data");
 	$p4->execute();
 	$p1->execute();
 	$resData = $p1->fetchAll(PDO::FETCH_ASSOC);
@@ -80,13 +81,14 @@ try
 			$tmpArray = array();
 			foreach($item->bivs as $bivObj)
 			{
-				if($item->bivs == '-') continue;
+				if($bivObj->biv == '-' || $bivObj->biv == '0.0') continue;
 				$tmpArray[] = $bivObj->biv;
 			}
 			$biv = array_median($tmpArray);
 			unset($tmpArray);
 			if($biv != -1)
 			{
+				#error_log($stockItem['stock_id'].' => '.$item->s.' '.$biv."\n");
 				$p2->execute(array('stock_id'=>$stockItem['stock_id'],
 					'warrant_id'=>$item->s,
 					'warrant_iv'=>$biv,
@@ -126,6 +128,7 @@ try
 			$p3->execute(array('stock_id'=>$warrant_item[4],
 					'warrant_id'=>$warrant_item[3],
 					'warrant_name'=>$warrant_item[2],
+					'stock_name'=>str_replace(" ","",$warrant_item[5]),
 					'warrant_type'=>$warrant_type,
 					'warrant_strike'=>$warrant_item[10],
 					'warrant_days'=>$warrant_item[13],

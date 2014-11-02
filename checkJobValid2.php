@@ -99,7 +99,7 @@ function CheckWarrantData($dbh)
 					"\n");
 			return -3;
 		}
-		$item = $p->fetch(PDO::FETCH_ASSOC);
+		$item = $p2->fetch(PDO::FETCH_ASSOC);
 		if(!isset($item['num']))
 		{
 			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No exist specific column to fetch (not null)'.
@@ -165,6 +165,8 @@ switch($ret)
 $ret = CheckStockInfo($dbh,'3227',$days);
 switch($ret)
 {
+	case 0:
+		break;
 	case -1:
 		$notify->pushNote($title,"統計上櫃股票資料有誤 ".$ret);
 		break;
@@ -186,6 +188,8 @@ switch($ret)
 $ret = CheckWarrantData($dbh);
 switch($ret)
 {
+	case 0:
+		break;
 	case -5:
 		$notify->pushNote($title,"抓取權證資料有誤 ".$ret);
 		break;
