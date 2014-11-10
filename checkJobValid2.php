@@ -139,24 +139,25 @@ error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n",3,'./log/valid.lo
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n");
 $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 	array( PDO::ATTR_PERSISTENT => false));
-$title = "證交所統計警示-ParseStock";
+$title = "證交所統計警示-Valid2";
+$current_date = new DateTime();
 # 上市挑一間檢查
 $ret = CheckStockInfo($dbh,'2002',$days);
 switch($ret)
 {
 	case -1:
-		$notify->pushNote($title,"統計上市股票資料有誤");
+		$notify->pushNote($title,$current_date->format('Y-m-d H:i:s')." 統計上市股票資料有誤");
 		break;
 	case -2:
 	case -3:
-		$notify->pushNote($title,"統計上市股票市值資料有誤");
+		$notify->pushNote($title,$current_date->format('Y-m-d H:i:s')." 統計上市股票市值資料有誤");
 		break;
 	case -4:
 	case -5:
-		$notify->pushNote($title,"統計上市股票資料日期不一致");
+		$notify->pushNote($title,$current_date->format('Y-m-d H:i:s')." 統計上市股票資料日期不一致");
 		break;
 	case -6:
-		$notify->pushNote($title,"統計上市公司資料有誤");
+		$notify->pushNote($title,$current_date->format('Y-m-d H:i:s')." 統計上市公司資料有誤");
 		break;
 	default:
 		break;
@@ -168,33 +169,39 @@ switch($ret)
 	case 0:
 		break;
 	case -1:
-		$notify->pushNote($title,"統計上櫃股票資料有誤 ".$ret);
+		$notify->pushNote($title,$current_date->format('Y-m-d H:i:s')." 統計上櫃股票資料有誤 ".$ret);
 		break;
 	case -2:
 	case -3:
-		$notify->pushNote($title,"統計上櫃股票市值資料有誤 ".$ret);
+		$notify->pushNote($title,$current_date->format('Y-m-d H:i:s')." 統計上櫃股票市值資料有誤 ".$ret);
 		break;
 	case -4:
 	case -5:
-		$notify->pushNote($title,"統計上櫃股票資料日期不一致 ".$ret);
+		$notify->pushNote($title,$current_date->format('Y-m-d H:i:s')." 統計上櫃股票資料日期不一致 ".$ret);
 		break;
 	case -6:
-		$notify->pushNote($title,"統計上櫃公司資料有誤 ".$ret);
+		$notify->pushNote($title,$current_date->format('Y-m-d H:i:s')." 統計上櫃公司資料有誤 ".$ret);
 		break;
 	default:
 		break;
 }
 
+
+$SinoWarrant = new SinoWarrant($DB);
 $ret = CheckWarrantData($dbh);
 switch($ret)
 {
 	case 0:
 		break;
 	case -5:
-		$notify->pushNote($title,"抓取權證資料有誤 ".$ret);
+		$notify->pushNote($title,$current_date->format('Y-m-d H:i:s')." 抓取權證資料有誤 ".$ret);
+		# 抓元大的有問題, 就去抓永豐的
+		$SinoWarrant->fetchData();
 		break;
 	default:
-		$notify->pushNote($title,"抓取權證資料有誤 ".$ret);
+		$notify->pushNote($title,$current_date->format('Y-m-d H:i:s')." 抓取權證資料有誤 ".$ret);
+		# 抓元大的有問題, 就去抓永豐的
+		$SinoWarrant->fetchData();
 		break;
 }
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Finish'."\n",3,'./log/valid.log');

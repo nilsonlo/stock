@@ -57,8 +57,8 @@ try
 		:warrant_multi,:stock_type,:updated_at) on duplicate key update warrant_name=:warrant_name,
 		stock_name=:stock_name,warrant_type=:warrant_type,warrant_strike=:warrant_strike,warrant_days=:warrant_days,
 		warrant_multi=:warrant_multi,stock_type=:stock_type,updated_at=:updated_at");
-	$p4 = $dbh->prepare("delete from warrant_data");
-	$p4->execute();
+#	$p4 = $dbh->prepare("delete from warrant_data");
+#	$p4->execute();
 	$p1->execute();
 	$resData = $p1->fetchAll(PDO::FETCH_ASSOC);
 	foreach($resData as $stockItem)
