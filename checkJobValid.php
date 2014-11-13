@@ -1,6 +1,29 @@
 #!/usr/bin/php -q
 <?php
 require_once('./auto_load.php');
+function CheckHistoryIndexData($dbh,$stock_id,$days)
+{
+	try {
+                # 錯誤的話, 就不做了
+                $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
+		# check stock history data
+		$p = $dbh->prepare("select * from `history_data` where stock_id=:stock_id and days=:days");
+		$p->execute(array('stock_id'=>$stock_id,'days'=>$days));
+		if($p->rowCount() === 0)
+		{
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No Exists Index : '. $stock_id .
+					' in '. $days . "\n",3,'./log/valid.log');
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' No Exists Index : '. $stock_id .
+					' in '. $days . "\n");
+			return -1;
+		}
+		return 0;
+        } catch (PDOException $e) {
+		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Error : ('.$e->getLine().') '.$e->getMessage()."\n",3,'./log/valid.log');
+		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Error : ('.$e->getLine().') '.$e->getMessage()."\n");
+		return -2;
+        }
+}
 function CheckHistoryData($dbh,$stock_id,$days)
 {
 	try {
@@ -58,6 +81,17 @@ error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n");
 $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 	array( PDO::ATTR_PERSISTENT => false));
 $title = "證交所抓取警示-HistoryData";
+# 上市指數檢查
+$ret = CheckHistoryIndexData($dbh,'t00',$days);
+switch($ret)
+{
+	case -1:
+	case -2:
+		$notify->pushNote($title,"抓取上市指數資料有誤 ".$ret);
+		break;
+	default:
+		break;
+}
 # 上市挑一間檢查
 $ret = CheckHistoryData($dbh,'2002',$days);
 switch($ret)

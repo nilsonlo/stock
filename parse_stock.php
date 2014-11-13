@@ -42,10 +42,10 @@ function Perform90Days($DB)
         }
 }
 
-function ComputeStockAmount($DB,$stock_id)
+function ComputeStockAmount($DB,$stock_id,$isIndex=false)
 {
 	$outputArray = array(
-			'lastamount2'=>0,'lastprice2'=>0,
+			'lastamount'=>0,'lastamount2'=>0,'lastprice2'=>0,
 			'days5'=>0,'amount5'=>0,'hp_days5'=>0,'hprice5'=>0,'lp_days5'=>0,'lprice5'=>0,
 			'days10'=>0,'amount10'=>0,'hp_days10'=>0,'hprice10'=>0,'lp_days10'=>0,'lprice10'=>0,
 			'days15'=>0,'amount15'=>0,'hp_days15'=>0,'hprice15'=>0,'lp_days15'=>0,'lprice15'=>0,
@@ -76,7 +76,9 @@ function ComputeStockAmount($DB,$stock_id)
 		$resData = $p->fetchAll(PDO::FETCH_ASSOC);
 		$output = array('days'=>0,'amount'=>0,
 				'hdays'=>0,'high_price'=>0,
-				'ldays'=>0,'low_price'=>999999);
+				'ldays'=>0,'low_price'=>999999,
+				'avg_amount'=>0);
+			
 		foreach($resData as $i=>$item)
 		{
 			if($output['amount'] < $item['deal_amount'])
@@ -94,15 +96,31 @@ function ComputeStockAmount($DB,$stock_id)
 				$output['low_price'] = $item['lowest_price'];
 				$output['ldays'] = $item['days'];
 			}
+			if($isIndex)
+			{
+				$output['avg_amount'] += intval($item['deal_amount']);
+			}
+
 			switch($i)
 			{
-				case 1:
-					$outputArray['lastamount2'] = intval($item['deal_amount']/1000);
+				case 1:	//昨天
+					if(!$isIndex)
+						$outputArray['lastamount2'] = intval($item['deal_amount']/1000);
 					$outputArray['lastprice2'] = $item['end_price'];
+					break;
+				case 2:	//前天
+					if($isIndex)
+					{
+						//取得3日均量
+						$outputArray['lastamount2'] = intval($output['avg_amount']/($i+1));
+					}
 					break;
 				case 4:
 					$outputArray['days5'] = $output['days'];
-					$outputArray['amount5'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount5'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount5'] = intval($output['amount']);
 					$outputArray['hp_days5'] = $output['hdays'];
 					$outputArray['hprice5'] = $output['high_price'];
 					$outputArray['lp_days5'] = $output['ldays'];
@@ -110,7 +128,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 9:
 					$outputArray['days10'] = $output['days'];
-					$outputArray['amount10'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount10'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount10'] = intval($output['amount']);
 					$outputArray['hp_days10'] = $output['hdays'];
 					$outputArray['hprice10'] = $output['high_price'];
 					$outputArray['lp_days10'] = $output['ldays'];
@@ -118,7 +139,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 14:
 					$outputArray['days15'] = $output['days'];
-					$outputArray['amount15'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount15'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount15'] = intval($output['amount']);
 					$outputArray['hp_days15'] = $output['hdays'];
 					$outputArray['hprice15'] = $output['high_price'];
 					$outputArray['lp_days15'] = $output['ldays'];
@@ -126,7 +150,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 19:
 					$outputArray['days20'] = $output['days'];
-					$outputArray['amount20'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount20'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount20'] = intval($output['amount']);
 					$outputArray['hp_days20'] = $output['hdays'];
 					$outputArray['hprice20'] = $output['high_price'];
 					$outputArray['lp_days20'] = $output['ldays'];
@@ -134,7 +161,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 24:
 					$outputArray['days25'] = $output['days'];
-					$outputArray['amount25'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount25'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount25'] = intval($output['amount']);
 					$outputArray['hp_days25'] = $output['hdays'];
 					$outputArray['hprice25'] = $output['high_price'];
 					$outputArray['lp_days25'] = $output['ldays'];
@@ -142,7 +172,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 29:
 					$outputArray['days30'] = $output['days'];
-					$outputArray['amount30'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount30'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount30'] = intval($output['amount']);
 					$outputArray['hp_days30'] = $output['hdays'];
 					$outputArray['hprice30'] = $output['high_price'];
 					$outputArray['lp_days30'] = $output['ldays'];
@@ -150,7 +183,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 34:
 					$outputArray['days35'] = $output['days'];
-					$outputArray['amount35'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount35'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount35'] = intval($output['amount']);
 					$outputArray['hp_days35'] = $output['hdays'];
 					$outputArray['hprice35'] = $output['high_price'];
 					$outputArray['lp_days35'] = $output['ldays'];
@@ -158,7 +194,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 39:
 					$outputArray['days40'] = $output['days'];
-					$outputArray['amount40'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount40'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount40'] = intval($output['amount']);
 					$outputArray['hp_days40'] = $output['hdays'];
 					$outputArray['hprice40'] = $output['high_price'];
 					$outputArray['lp_days40'] = $output['ldays'];
@@ -166,7 +205,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 44:
 					$outputArray['days45'] = $output['days'];
-					$outputArray['amount45'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount45'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount45'] = intval($output['amount']);
 					$outputArray['hp_days45'] = $output['hdays'];
 					$outputArray['hprice45'] = $output['high_price'];
 					$outputArray['lp_days45'] = $output['ldays'];
@@ -174,7 +216,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 49:
 					$outputArray['days50'] = $output['days'];
-					$outputArray['amount50'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount50'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount50'] = intval($output['amount']);
 					$outputArray['hp_days50'] = $output['hdays'];
 					$outputArray['hprice50'] = $output['high_price'];
 					$outputArray['lp_days50'] = $output['ldays'];
@@ -182,7 +227,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 54:
 					$outputArray['days55'] = $output['days'];
-					$outputArray['amount55'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount55'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount55'] = intval($output['amount']);
 					$outputArray['hp_days55'] = $output['hdays'];
 					$outputArray['hprice55'] = $output['high_price'];
 					$outputArray['lp_days55'] = $output['ldays'];
@@ -190,7 +238,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 59:
 					$outputArray['days60'] = $output['days'];
-					$outputArray['amount60'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount60'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount60'] = intval($output['amount']);
 					$outputArray['hp_days60'] = $output['hdays'];
 					$outputArray['hprice60'] = $output['high_price'];
 					$outputArray['lp_days60'] = $output['ldays'];
@@ -198,7 +249,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 64:
 					$outputArray['days65'] = $output['days'];
-					$outputArray['amount65'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount65'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount65'] = intval($output['amount']);
 					$outputArray['hp_days65'] = $output['hdays'];
 					$outputArray['hprice65'] = $output['high_price'];
 					$outputArray['lp_days65'] = $output['ldays'];
@@ -206,7 +260,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 69:
 					$outputArray['days70'] = $output['days'];
-					$outputArray['amount70'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount70'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount70'] = intval($output['amount']);
 					$outputArray['hp_days70'] = $output['hdays'];
 					$outputArray['hprice70'] = $output['high_price'];
 					$outputArray['lp_days70'] = $output['ldays'];
@@ -214,7 +271,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 74:
 					$outputArray['days75'] = $output['days'];
-					$outputArray['amount75'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount75'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount75'] = intval($output['amount']);
 					$outputArray['hp_days75'] = $output['hdays'];
 					$outputArray['hprice75'] = $output['high_price'];
 					$outputArray['lp_days75'] = $output['ldays'];
@@ -222,7 +282,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 79:
 					$outputArray['days80'] = $output['days'];
-					$outputArray['amount80'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount80'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount80'] = intval($output['amount']);
 					$outputArray['hp_days80'] = $output['hdays'];
 					$outputArray['hprice80'] = $output['high_price'];
 					$outputArray['lp_days80'] = $output['ldays'];
@@ -230,7 +293,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 84:
 					$outputArray['days85'] = $output['days'];
-					$outputArray['amount85'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount85'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount85'] = intval($output['amount']);
 					$outputArray['hp_days85'] = $output['hdays'];
 					$outputArray['hprice85'] = $output['high_price'];
 					$outputArray['lp_days85'] = $output['ldays'];
@@ -238,7 +304,10 @@ function ComputeStockAmount($DB,$stock_id)
 					break;
 				case 89:
 					$outputArray['days90'] = $output['days'];
-					$outputArray['amount90'] = intval($output['amount']/1000);
+					if(!$isIndex)
+						$outputArray['amount90'] = intval($output['amount']/1000);
+					else
+						$outputArray['amount90'] = intval($output['amount']);
 					$outputArray['hp_days90'] = $output['hdays'];
 					$outputArray['hprice90'] = $output['high_price'];
 					$outputArray['lp_days90'] = $output['ldays'];
@@ -270,8 +339,8 @@ function TextIntoDB($DB,$data)
 			return;
 		}
 		$item = $p->fetch(PDO::FETCH_ASSOC);
-
-		$outputArray = ComputeStockAmount($DB,$item['stock_id']);
+		$isIndex = (intval($item['warrant_type']) === 0)?true:false;
+		$outputArray = ComputeStockAmount($DB,$item['stock_id'],$isIndex);
 		if($item['stock_type'] == 1)
 		{
 			$twse_stock_id = 'tse_'.$item['stock_id'].'.tw';
@@ -282,7 +351,8 @@ function TextIntoDB($DB,$data)
 		}
 		$outputArray['stock_id'] = $item['stock_id'];
 		$outputArray['totalamount'] = $item['totalamount'];
-		$outputArray['lastamount'] = intval($item['deal_amount']/1000);
+		if(!$isIndex)
+			$outputArray['lastamount'] = intval($item['deal_amount']/1000);
 		$outputArray['lastprice'] = $item['end_price'];
 		$outputArray['twse_stock_id'] = $twse_stock_id;
 		$outputArray['last_stock_id'] = $twse_stock_id.$item['days'];
@@ -381,6 +451,10 @@ $resData = file($checkFile,FILE_IGNORE_NEW_LINES);
 foreach($resData as $i=>$line)
 {
 	$keywords = preg_split("/,/",$line);
+	if($keywords[0] == '$TWT') $keywords[0] = 't00';
+	else if($keywords[0] == '$TWT13') $keywords[0] = 't13';
+	else if($keywords[0] == '$TWT17') $keywords[0] = 't17';
+	echo $keywords[0];	
         TextIntoDB($ini_array['DB'],$keywords[0]);
 //	if($i==1) break;
 }
