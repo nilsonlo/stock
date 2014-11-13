@@ -23,8 +23,8 @@ $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 # 錯誤的話, 就不做了
 $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
 $p = $dbh->prepare("insert into `history_data` (`days`,`stock_id`,`stock_name`,`deal_amount`,`start_price`,`highest_price`,
-		`lowest_price`,`end_price`,`stock_type`,`warrant_type`,`created_at`) values (:days,:stock_id,:stock_name,
-		:deal_amount,:start_price,:highest_price,:lowest_price,:end_price,1,0,now()) on duplicate key update
+		`lowest_price`,`end_price`,`stock_type`,`created_at`) values (:days,:stock_id,:stock_name,:deal_amount,
+		:start_price,:highest_price,:lowest_price,:end_price,0,now()) on duplicate key update
 		stock_name=:stock_name,deal_amount=:deal_amount,start_price=:start_price,highest_price=:highest_price,
 		lowest_price=:lowest_price,end_price=:end_price,created_at=now()");
 
@@ -35,10 +35,15 @@ if(isset($dataObject->msgArray))
 {
 	foreach($dataObject->msgArray as $stock)
 	{
+		if($stock->c == 't00')
+			$name = mb_substr($stock->n,0,3,mb_detect_encoding($stock->n));
+		else
+			$name = mb_substr($stock->n,0,2,mb_detect_encoding($stock->n));
+			
 		$itemArray = array(
 			'days'=>$days,
 			'stock_id'=>$stock->c,
-			'stock_name'=>$stock->n,
+			'stock_name'=>$name,
 			'deal_amount'=>isset($stock->v)?$stock->v:0,
 			'start_price'=>$stock->o,
 			'highest_price'=>$stock->h,

@@ -47,7 +47,7 @@ try
 				PDO::ATTR_PERSISTENT => false));
 	# 錯誤的話, 就不做了
 	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
-	$p1 = $dbh->prepare("select stock_id,twse_stock_id from stock_info");
+	$p1 = $dbh->prepare("select * from stock_info");
 	$p2 = $dbh->prepare("insert into `warrant_data` (`stock_id`,`warrant_id`,`warrant_iv`,`warrant_type`,
 		`stock_type`) values (:stock_id,:warrant_id,:warrant_iv,:warrant_type,:stock_type) 
 		on duplicate key update warrant_iv=:warrant_iv,warrant_type=:warrant_type,stock_type=:stock_type");
@@ -63,10 +63,8 @@ try
 	$resData = $p1->fetchAll(PDO::FETCH_ASSOC);
 	foreach($resData as $stockItem)
 	{
-		if(strpos($stockItem['twse_stock_id'],"tse") === false)
-			$stock_type=2;
-		else
-			$stock_type=1;
+		if($stockItem['stock_type'] == '0') continue;
+		$stock_type = $stockItem['stock_type'];
 
 		$url = "http://warrant.sinotrade.com.tw/warrant2010/json_biv.jsp?ul=".$stockItem['stock_id']."&callback=jsonp";
 		$output = GetWebService($url);

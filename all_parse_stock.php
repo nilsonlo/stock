@@ -263,9 +263,9 @@ function ArrayIntoDB($dbh,$data)
 		$outputArray['lastamount'] = intval($item['deal_amount']/1000);
 		$outputArray['lastprice'] = $item['end_price'];
 		$outputArray['twse_stock_id'] = $twse_stock_id;
-		$outputArray['last_stock_id'] = $twse_stock_id.$item['days'];
+		$outputArray['stock_type'] = $item['stock_type'];
 		$p2 = $dbh->prepare("insert into `all_stock_info` (stock_id,
-			twse_stock_id,last_stock_id,
+			twse_stock_id,stock_type,
 			totalamount,lastamount,lastprice,lastamount2,lastprice2,
 			days5,amount5,hp_days5,hprice5,lp_days5,lprice5,
 			days10,amount10,hp_days10,hprice10,lp_days10,lprice10,
@@ -285,7 +285,7 @@ function ArrayIntoDB($dbh,$data)
 			days80,amount80,hp_days80,hprice80,lp_days80,lprice80,
 			days85,amount85,hp_days85,hprice85,lp_days85,lprice85,
 			days90,amount90,hp_days90,hprice90,lp_days90,lprice90,
-			updated_at) values (:stock_id,:twse_stock_id,:last_stock_id,
+			updated_at) values (:stock_id,:twse_stock_id,:stock_type,
 			:totalamount,:lastamount,:lastprice,:lastamount2,:lastprice2,
 			:days5,:amount5,:hp_days5,:hprice5,:lp_days5,:lprice5,
 			:days10,:amount10,:hp_days10,:hprice10,:lp_days10,:lprice10,
@@ -306,7 +306,7 @@ function ArrayIntoDB($dbh,$data)
 			:days85,:amount85,:hp_days85,:hprice85,:lp_days85,:lprice85,
 			:days90,:amount90,:hp_days90,:hprice90,:lp_days90,:lprice90,
 			now()) on duplicate key update
-			twse_stock_id=:twse_stock_id,last_stock_id=:last_stock_id,
+			twse_stock_id=:twse_stock_id,stock_type=:stock_type,
 			totalamount=:totalamount,lastamount=:lastamount,lastprice=:lastprice,
 			lastamount2=:lastamount2,lastprice2=:lastprice2,
 			days5=:days5,amount5=:amount5,hp_days5=:hp_days5,hprice5=:hprice5,lp_days5=:lp_days5,lprice5=:lprice5,

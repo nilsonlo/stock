@@ -22,10 +22,10 @@ $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 # 錯誤的話, 就不做了
 $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
 $days = $Year.$Month.$Day;
-$p1 = $dbh->prepare("select * from `history_data` where days=:days and stock_type=1 and warrant_type=1 limit 1");
+$p1 = $dbh->prepare("select * from `history_data` where days=:days and stock_type=1 limit 1");
 $p2 = $dbh->prepare("insert into `history_data` (`days`,`stock_id`,`stock_name`,`deal_amount`,`start_price`,`highest_price`,
-		`lowest_price`,`end_price`,`stock_type`,`warrant_type`,`created_at`) values (:days,:stock_id,:stock_name,
-		:deal_amount,:start_price,:highest_price,:lowest_price,:end_price,1,1,now())");
+		`lowest_price`,`end_price`,`stock_type`,`created_at`) values (:days,:stock_id,:stock_name,:deal_amount,
+		:start_price,:highest_price,:lowest_price,:end_price,1,now())");
 $p1->execute(array('days'=>$days));
 if($p1->rowCount() !== 0)
 {

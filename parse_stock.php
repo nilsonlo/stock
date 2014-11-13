@@ -45,7 +45,7 @@ function Perform90Days($DB)
 function ComputeStockAmount($DB,$stock_id,$isIndex=false)
 {
 	$outputArray = array(
-			'lastamount'=>0,'lastamount2'=>0,'lastprice2'=>0,
+			'lastamount2'=>0,'lastprice2'=>0,
 			'days5'=>0,'amount5'=>0,'hp_days5'=>0,'hprice5'=>0,'lp_days5'=>0,'lprice5'=>0,
 			'days10'=>0,'amount10'=>0,'hp_days10'=>0,'hprice10'=>0,'lp_days10'=>0,'lprice10'=>0,
 			'days15'=>0,'amount15'=>0,'hp_days15'=>0,'hprice15'=>0,'lp_days15'=>0,'lprice15'=>0,
@@ -339,25 +339,30 @@ function TextIntoDB($DB,$data)
 			return;
 		}
 		$item = $p->fetch(PDO::FETCH_ASSOC);
-		$isIndex = (intval($item['warrant_type']) === 0)?true:false;
+		$isIndex = (intval($item['stock_type']) === 0)?true:false;
 		$outputArray = ComputeStockAmount($DB,$item['stock_id'],$isIndex);
-		if($item['stock_type'] == 1)
+		switch($item['stock_type'])
 		{
-			$twse_stock_id = 'tse_'.$item['stock_id'].'.tw';
+			case '0':
+			case '1':
+				$twse_stock_id = 'tse_'.$item['stock_id'].'.tw';
+				break;
+			case '2':
+				$twse_stock_id = 'otc_'.$item['stock_id'].'.tw';
+				break;
 		}
-		else
-		{
-			$twse_stock_id = 'otc_'.$item['stock_id'].'.tw';
-		}
+					
 		$outputArray['stock_id'] = $item['stock_id'];
 		$outputArray['totalamount'] = $item['totalamount'];
 		if(!$isIndex)
 			$outputArray['lastamount'] = intval($item['deal_amount']/1000);
+		else
+			$outputArray['lastamount'] = intval($item['deal_amount']);
 		$outputArray['lastprice'] = $item['end_price'];
 		$outputArray['twse_stock_id'] = $twse_stock_id;
-		$outputArray['last_stock_id'] = $twse_stock_id.$item['days'];
+		$outputArray['stock_type'] = $item['stock_type'];
 		$p2 = $dbh->prepare("insert into `stock_info` (stock_id,
-			twse_stock_id,last_stock_id,
+			twse_stock_id,stock_type,
 			totalamount,lastamount,lastprice,lastamount2,lastprice2,
 			days5,amount5,hp_days5,hprice5,lp_days5,lprice5,
 			days10,amount10,hp_days10,hprice10,lp_days10,lprice10,
@@ -377,7 +382,7 @@ function TextIntoDB($DB,$data)
 			days80,amount80,hp_days80,hprice80,lp_days80,lprice80,
 			days85,amount85,hp_days85,hprice85,lp_days85,lprice85,
 			days90,amount90,hp_days90,hprice90,lp_days90,lprice90,
-			updated_at) values (:stock_id,:twse_stock_id,:last_stock_id,
+			updated_at) values (:stock_id,:twse_stock_id,:stock_type,
 			:totalamount,:lastamount,:lastprice,:lastamount2,:lastprice2,
 			:days5,:amount5,:hp_days5,:hprice5,:lp_days5,:lprice5,
 			:days10,:amount10,:hp_days10,:hprice10,:lp_days10,:lprice10,
@@ -398,7 +403,7 @@ function TextIntoDB($DB,$data)
 			:days85,:amount85,:hp_days85,:hprice85,:lp_days85,:lprice85,
 			:days90,:amount90,:hp_days90,:hprice90,:lp_days90,:lprice90,
 			now()) on duplicate key update
-			twse_stock_id=:twse_stock_id,last_stock_id=:last_stock_id,
+			twse_stock_id=:twse_stock_id,stock_type=:stock_type,
 			totalamount=:totalamount,lastamount=:lastamount,lastprice=:lastprice,
 			lastamount2=:lastamount2,lastprice2=:lastprice2,
 			days5=:days5,amount5=:amount5,hp_days5=:hp_days5,hprice5=:hprice5,lp_days5=:lp_days5,lprice5=:lprice5,
@@ -454,7 +459,6 @@ foreach($resData as $i=>$line)
 	if($keywords[0] == '$TWT') $keywords[0] = 't00';
 	else if($keywords[0] == '$TWT13') $keywords[0] = 't13';
 	else if($keywords[0] == '$TWT17') $keywords[0] = 't17';
-	echo $keywords[0];	
         TextIntoDB($ini_array['DB'],$keywords[0]);
 //	if($i==1) break;
 }
