@@ -23,8 +23,8 @@ function Perform90Days($DB)
                 # 錯誤的話, 就不做了
                 $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
 		# 找出所有的記錄
-		$p1 = $dbh->prepare("select days from `history_data` group by days");
-		$p2 = $dbh->prepare("select days from `history_data` limit 1");
+		$p1 = $dbh->prepare("select days from `history_data` where stock_type!=0 group by days");
+		$p2 = $dbh->prepare("select days from `history_data` where stock_type!=0 limit 1");
 		# 刪除超過90天的所有股票跟權證
 		$p3 = $dbh->prepare("delete from `history_data` where days=:days");
 		$p1->execute();

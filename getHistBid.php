@@ -57,8 +57,6 @@ try
 		:warrant_multi,:stock_type,:updated_at) on duplicate key update warrant_name=:warrant_name,
 		stock_name=:stock_name,warrant_type=:warrant_type,warrant_strike=:warrant_strike,warrant_days=:warrant_days,
 		warrant_multi=:warrant_multi,stock_type=:stock_type,updated_at=:updated_at");
-#	$p4 = $dbh->prepare("delete from warrant_data");
-#	$p4->execute();
 	$p1->execute();
 	$resData = $p1->fetchAll(PDO::FETCH_ASSOC);
 	foreach($resData as $stockItem)
@@ -94,7 +92,7 @@ try
 					'stock_type'=>$stock_type,
 					));
 			}
-		}
+		}	//End of foreach
 		unset($warrant_data);
 
 		$url = "https://www.warrantwin.com.tw/ws/NewWarSearch.aspx?showType=basic_123&p=CPCode,Derivative,Broker,Conver,Lever,S_BuyIV,E_BuyIV,Sp,Ep,S_Period,E_Period,BuySellRate,PageSize,PageNo,listCode,Amt,Vol&v=7,ALL,ALL,ALL,ALL,,,-10000,10000,,,ALL,8000,1,".$stockItem['stock_id'].",ALL,ALL";
@@ -134,8 +132,13 @@ try
 					'stock_type'=>$stock_type,
 					'updated_at'=>$current_date->format("Ymd"),
 					));
-		}
-	}
+		}	//End of foreach
+	}	//End of foreach
+	//Clean the warrant day = 0
+	$p4 = $dbh->prepare("delete from warrant_data where updated_at!=:days and warrant_days=0");
+	$days = $current_date->format('Ymd');
+	$p4->bindParam(':days',$days,PDO::PARAM_STR);
+	$p4->execute();
 }
 catch(PDOException $e)
 {
