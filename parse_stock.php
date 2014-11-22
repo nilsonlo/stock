@@ -435,19 +435,35 @@ function TextIntoDB($DB,$data)
 }
 
 $ini_array = parse_ini_file("./db.ini",true);
-if($argc != 2)
+if($argc != 3)
 {
-	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Syntax Error : '.$argv[0]." CSV File\n",3,'./log/stock.log');
-	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Syntax Error : '.$argv[0]." CSV File\n");
+	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Syntax Error : '.$argv[0].
+			" CSVFile BlockCSVFile\n",3,'./log/stock.log');
+	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Syntax Error : '.$argv[0].
+			" CSVFile BlockCSVFile\n");
 	exit;
 }
 if(!file_exists($argv[1]))
 {
-	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' File not exists : '.$argv[1]."\n",3,'./log/stock.log');
-	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' File not exists : '.$argv[1]."\n");
+	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' CSVFile not exists : '.$argv[1]."\n",3,'./log/stock.log');
+	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' CSVFile not exists : '.$argv[1]."\n");
+	exit;
+}
+if(!file_exists($argv[2]))
+{
+	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' BlockCSVFile not exists : '.$argv[1]."\n",3,'./log/stock.log');
+	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' BlockCSVFile not exists : '.$argv[1]."\n");
 	exit;
 }
 $checkFile = $argv[1];
+$blockFile = $argv[2];
+$Datas = file($blockFile,FILE_IGNORE_NEW_LINES);
+$BlockData = array();
+foreach($Datas as $line)
+{
+	$keywords = preg_split("/,/",$line);
+	$BlockData[$keywords[0]] = $keywords[1];
+}
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n",3,'./log/stock.log');
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n");
 Perform90Days($ini_array['DB']);
@@ -459,6 +475,7 @@ foreach($resData as $i=>$line)
 	if($keywords[0] == '$TWT') $keywords[0] = 't00';
 	else if($keywords[0] == '$TWT13') $keywords[0] = 't13';
 	else if($keywords[0] == '$TWT17') $keywords[0] = 't17';
+	if(isset($BlockData[$keywords[0]])) continue;
         TextIntoDB($ini_array['DB'],$keywords[0]);
 //	if($i==1) break;
 }
