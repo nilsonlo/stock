@@ -47,16 +47,18 @@ try
 				PDO::ATTR_PERSISTENT => false));
 	# 錯誤的話, 就不做了
 	$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
-	$p1 = $dbh->prepare("select * from stock_info");
+	$p1 = $dbh->prepare("select * from stock_info where stock_type!=0");
 	$p2 = $dbh->prepare("insert into `warrant_data` (`stock_id`,`warrant_id`,`warrant_iv`,`warrant_type`,
-		`stock_type`) values (:stock_id,:warrant_id,:warrant_iv,:warrant_type,:stock_type) 
-		on duplicate key update warrant_iv=:warrant_iv,warrant_type=:warrant_type,stock_type=:stock_type");
+		`stock_type`,`stock_price`) values (:stock_id,:warrant_id,:warrant_iv,:warrant_type,:stock_type,:stock_price) 
+		on duplicate key update warrant_iv=:warrant_iv,warrant_type=:warrant_type,stock_type=:stock_type,
+		stock_price=:stock_price");
 	$p3 = $dbh->prepare("insert into `warrant_data` (`stock_id`,`warrant_id`,`warrant_name`,`stock_name`,
-		`warrant_type`,`warrant_strike`,`warrant_days`,`warrant_multi`,`stock_type`,`updated_at`) values 
-		(:stock_id,:warrant_id,:warrant_name,:stock_name,:warrant_type,:warrant_strike,:warrant_days,
-		:warrant_multi,:stock_type,:updated_at) on duplicate key update warrant_name=:warrant_name,
-		stock_name=:stock_name,warrant_type=:warrant_type,warrant_strike=:warrant_strike,warrant_days=:warrant_days,
-		warrant_multi=:warrant_multi,stock_type=:stock_type,updated_at=:updated_at");
+		`warrant_type`,`warrant_strike`,`warrant_days`,`warrant_multi`,`stock_type`,`warrant_price`,
+		`updated_at`) values (:stock_id,:warrant_id,:warrant_name,:stock_name,:warrant_type,:warrant_strike,
+		:warrant_days,:warrant_multi,:stock_type,:warrant_price,:updated_at) on duplicate key update 
+		warrant_name=:warrant_name,stock_name=:stock_name,warrant_type=:warrant_type,
+		warrant_strike=:warrant_strike,warrant_days=:warrant_days,warrant_multi=:warrant_multi,
+		stock_type=:stock_type,warrant_price=:warrant_price,updated_at=:updated_at");
 	$p1->execute();
 	$resData = $p1->fetchAll(PDO::FETCH_ASSOC);
 	foreach($resData as $stockItem)
@@ -90,6 +92,7 @@ try
 					'warrant_iv'=>$biv,
 					'warrant_type'=>$warrant_type,
 					'stock_type'=>$stock_type,
+					'stock_price'=>$stockItem['lastprice'],
 					));
 			}
 		}	//End of foreach
@@ -130,6 +133,7 @@ try
 					'warrant_days'=>$warrant_item[13],
 					'warrant_multi'=>$warrant_item[11],
 					'stock_type'=>$stock_type,
+					'warrant_price'=>($warrant_item[6] == '--')?"0.0":$warrant_item[6],
 					'updated_at'=>$current_date->format("Ymd"),
 					));
 		}	//End of foreach

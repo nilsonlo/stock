@@ -20,13 +20,13 @@ class SinoWarrant {
 	{
 		try
 		{
-			$p1 = $this->dbh->prepare("select stock_id,twse_stock_id from stock_info where stock_id='2002'");
+			$p1 = $this->dbh->prepare("select stock_id,twse_stock_id from stock_info where stock_type!=0");
 			$p2 = $this->dbh->prepare("insert into `warrant_data` (`stock_id`,`warrant_id`,`warrant_name`,`stock_name`,
-		`warrant_type`,`warrant_strike`,`warrant_days`,`warrant_multi`,`stock_type`,`updated_at`) values 
+		`warrant_type`,`warrant_strike`,`warrant_days`,`warrant_multi`,`stock_type`,`warrant_price`,`updated_at`) values 
 		(:stock_id,:warrant_id,:warrant_name,:stock_name,:warrant_type,:warrant_strike,:warrant_days,
-		:warrant_multi,:stock_type,:updated_at) on duplicate key update warrant_name=:warrant_name,
+		:warrant_multi,:stock_type,:warrant_price,:updated_at) on duplicate key update warrant_name=:warrant_name,
 		stock_name=:stock_name,warrant_type=:warrant_type,warrant_strike=:warrant_strike,warrant_days=:warrant_days,
-		warrant_multi=:warrant_multi,stock_type=:stock_type,updated_at=:updated_at");
+		warrant_multi=:warrant_multi,stock_type=:stock_type,warrant_price=:warrant_price,updated_at=:updated_at");
 			$p1->execute();
 			$resData = $p1->fetchAll(PDO::FETCH_ASSOC);
 			foreach($resData as $stockItem)
@@ -58,6 +58,7 @@ class SinoWarrant {
                                         	'warrant_days'=>$itemObj->item->days,
 						'warrant_multi'=>$itemObj->item->multi,
 						'stock_type'=>$stock_type,
+						'warrant_price'=>($itemObj->item->bid == '-')?"0.0":$itemObj->item->bid,
 						'updated_at'=>$this->current_date->format("Ymd"),
 					));
 				}
