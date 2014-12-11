@@ -1,4 +1,3 @@
-#!/usr/bin/php -q
 <?php
 #永豐證券
 class SinoWarrant {
@@ -76,3 +75,4 @@ class SinoWarrant {
 		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Finish'."\n");
 	}
 }
+

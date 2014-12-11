@@ -45,7 +45,11 @@ function DeleteStockNoWarrantInfo($dbh)
 function ComputeStockAmount($dbh,$stock_id,$isIndex=false)
 {
 	$outputArray = array(
+			'lastamount'=>0,'lastprice'=>0,
 			'lastamount2'=>0,'lastprice2'=>0,
+			'lastamount3'=>0,'lastprice3'=>0,
+			'lastamount4'=>0,'lastprice4'=>0,
+			'avgdays3amount'=>0,
 			'days5'=>0,'amount5'=>0,'hp_days5'=>0,'hprice5'=>0,'lp_days5'=>0,'lprice5'=>0,
 			'days10'=>0,'amount10'=>0,'hp_days10'=>0,'hprice10'=>0,'lp_days10'=>0,'lprice10'=>0,
 			'days15'=>0,'amount15'=>0,'hp_days15'=>0,'hprice15'=>0,'lp_days15'=>0,'lprice15'=>0,
@@ -101,18 +105,36 @@ function ComputeStockAmount($dbh,$stock_id,$isIndex=false)
 
 			switch($i)
 			{
-				case 1:	//昨天
+				case 0:	//昨天
+					if(!$isIndex)
+						$outputArray['lastamount'] = intval($item['deal_amount']/1000);
+					else
+						$outputArray['lastamount'] = intval($item['deal_amount']);
+					$outputArray['lastprice'] = $item['end_price'];
+					break;
+				case 1:	//前天
 					if(!$isIndex)
 						$outputArray['lastamount2'] = intval($item['deal_amount']/1000);
+					else
+						$outputArray['lastamount2'] = intval($item['deal_amount']);
 					$outputArray['lastprice2'] = $item['end_price'];
 					break;
-				case 2:	//前天
+				case 2:	//前2天
 					if($isIndex)
-					{
-						//取得3日均量
-						$outputArray['lastamount2'] = intval($output['avg_amount']/($i+1));
-					}
+						$outputArray['lastamount3'] = intval($item['deal_amount']);
+					else
+						$outputArray['lastamount3'] = intval($item['deal_amount']/1000);
+					//取得3日均量
+					$outputArray['avgdays3amount'] = intval($output['avg_amount']/($i+1));
+					$outputArray['lastprice3'] = $item['end_price'];
 					break;
+				case 3:	//前3天
+					if(!$isIndex)
+						$outputArray['lastamount4'] = intval($item['deal_amount']/1000);
+					else
+						$outputArray['lastamount4'] = intval($item['deal_amount']);
+					$outputArray['lastprice4'] = $item['end_price'];
+					break;	
 				case 4:
 					$outputArray['days5'] = $output['days'];
 					if(!$isIndex)
@@ -360,6 +382,7 @@ function TextIntoDB($dbh,$data)
 		$p2 = $dbh->prepare("insert into `stock_no_warrant_info` (stock_id,
 			twse_stock_id,stock_type,
 			totalamount,lastamount,lastprice,lastamount2,lastprice2,
+			lastamount3,lastprice3,lastamount4,lastprice4,avgdays3amount,
 			days5,amount5,hp_days5,hprice5,lp_days5,lprice5,
 			days10,amount10,hp_days10,hprice10,lp_days10,lprice10,
 			days15,amount15,hp_days15,hprice15,lp_days15,lprice15,
@@ -380,6 +403,7 @@ function TextIntoDB($dbh,$data)
 			days90,amount90,hp_days90,hprice90,lp_days90,lprice90,
 			updated_at) values (:stock_id,:twse_stock_id,:stock_type,
 			:totalamount,:lastamount,:lastprice,:lastamount2,:lastprice2,
+			:lastamount3,:lastprice3,:lastamount4,:lastprice4,:avgdays3amount,
 			:days5,:amount5,:hp_days5,:hprice5,:lp_days5,:lprice5,
 			:days10,:amount10,:hp_days10,:hprice10,:lp_days10,:lprice10,
 			:days15,:amount15,:hp_days15,:hprice15,:lp_days15,:lprice15,
@@ -402,6 +426,8 @@ function TextIntoDB($dbh,$data)
 			twse_stock_id=:twse_stock_id,stock_type=:stock_type,
 			totalamount=:totalamount,lastamount=:lastamount,lastprice=:lastprice,
 			lastamount2=:lastamount2,lastprice2=:lastprice2,
+			lastamount3=:lastamount3,lastprice3=:lastprice3,
+			lastamount4=:lastamount4,lastprice4=:lastprice4,avgdays3amount=:avgdays3amount,
 			days5=:days5,amount5=:amount5,hp_days5=:hp_days5,hprice5=:hprice5,lp_days5=:lp_days5,lprice5=:lprice5,
 			days10=:days10,amount10=:amount10,hp_days10=:hp_days10,hprice10=:hprice10,lp_days10=:lp_days10,lprice10=:lprice10,
 			days15=:days15,amount15=:amount15,hp_days15=:hp_days15,hprice15=:hprice15,lp_days15=:lp_days15,lprice15=:lprice15,
