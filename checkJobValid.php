@@ -81,13 +81,14 @@ error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n");
 $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 	array( PDO::ATTR_PERSISTENT => false));
 $title = "證交所抓取警示-HistoryData";
+$current_date = new DateTime();
 # 上市指數檢查
 $ret = CheckHistoryIndexData($dbh,'t00',$days);
 switch($ret)
 {
 	case -1:
 	case -2:
-		$notify->pushNote($title,"抓取上市指數資料有誤 ".$ret);
+		$notify->pushNote($title, $current_date->format('Y-m-d H:i:s')." 抓取上市指數資料有誤 t00 ".$ret);
 		break;
 	default:
 		break;
@@ -97,11 +98,11 @@ $ret = CheckHistoryData($dbh,'2002',$days);
 switch($ret)
 {
 	case -1:
-		$notify->pushNote($title,"抓取上市股票資料有誤 ".$ret);
+		$notify->pushNote($title, $current_date->format('Y-m-d H:i:s')." 抓取上市股票資料有誤 2002 ".$ret);
 		break;
 	case -2:
 	case -3:
-		$notify->pushNote($title,"抓取上市公司資料有誤 ".$ret);
+		$notify->pushNote($title, $current_date->format('Y-m-d H:i:s')." 抓取上市公司資料有誤 2002 ".$ret);
 		break;
 	default:
 		break;
@@ -111,11 +112,11 @@ $ret = CheckHistoryData($dbh,'3227',$days);
 switch($ret)
 {
 	case -1:
-		$notify->pushNote($title,"抓取上櫃股票資料有誤 ".$ret);
+		$notify->pushNote($title, $current_date->format('Y-m-d H:i:s')." 抓取上櫃股票資料有誤 3227 ".$ret);
 		break;
 	case -2:
 	case -3:
-		$notify->pushNote($title,"抓取上櫃公司資料有誤 ".$ret);
+		$notify->pushNote($title, $current_date->format('Y-m-d H:i:s')." 抓取上櫃公司資料有誤 3227 ".$ret);
 		break;
 	default:
 		break;
