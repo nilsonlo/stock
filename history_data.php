@@ -33,16 +33,14 @@ if($p1->rowCount() !== 0)
 	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' '.$days.' has exist data'."\n");
 	die();
 }
-$url = 'http://www.twse.com.tw/ch/trading/exchange/MI_INDEX/genpage/Report'.
-	$Year.$Month.'/A112'.$Year.$Month.$Day.'ALLBUT0999_1.php?select2=ALLBUT0999&chk_date='.$Year2.'/'.$Month.'/'.$Day;
-//echo $url."\n";
-//exit;
-$data = file_get_contents($url);
-//file_put_contents('1.html',$data);
-//exit;
+$url = 'http://www.twse.com.tw/ch/trading/exchange/MI_INDEX/MI_INDEX.php';
+$data = WebService::GetWebService($url,'twse_cookie.txt',array('download'=>'','qdate'=>$Year2.'/'.$Month.'/'.$Day,
+			'selectType'=>'ALLBUT0999'));
+#file_put_contents('1.html',$data);
+#exit;
 
 $DataArray = array();
-//$data = file_get_contents('1.html');
+#$data = file_get_contents('1.html');
 $html = str_get_html($data);
 if(!is_object($html) or !isset($html->nodes))
 {
@@ -50,14 +48,14 @@ if(!is_object($html) or !isset($html->nodes))
 	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' '.$days.' html is not object'."\n");
 	die();
 }
-$div = $html->find('div#tbl-containerx table',0);
+$div = $html->find('div#main-content table',1);
 if(!isset($div))
 {
 	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' '.$days.' div is undefined'."\n",3,'./log/stock.log');
 	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' '.$days.' div is undefined'."\n");
 	die();
 }
-foreach($div->find('tr.basic2') as $tr)
+foreach($div->find('tr') as $tr)
 {
 	$itemArray = array();
 	if(is_object($tr->children(15)))
