@@ -454,6 +454,24 @@ function TextIntoDB($DB,$data)
         return ;
 }
 
+function getBlockStock($DB)
+{
+	try {
+                $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
+                        array( PDO::ATTR_PERSISTENT => false));
+                # 錯誤的話, 就不做了
+                $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
+		# 找出所有的記錄
+		$p1 = $dbh->prepare("select * from `block_stock`");
+		$p1->execute();
+		return $p1->fetchAll(PDO::FETCH_OBJ);
+	} catch (PDOException $e) {
+		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Error : ('.$e->getLine().') '.$e->getMessage()."\n",3,'./log/stock.log');
+		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Error : ('.$e->getLine().') '.$e->getMessage()."\n");
+		return null;
+	}
+}
+
 function getDailyBlockStock($DB)
 {
 	try {
@@ -490,12 +508,12 @@ function deleteDailyBlockStock($DB)
 	}
 }
 $ini_array = parse_ini_file("./db.ini",true);
-if($argc != 3)
+if($argc != 2)
 {
 	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Syntax Error : '.$argv[0].
-			" CSVFile BlockCSVFile\n",3,'./log/stock.log');
+			" CSVFile\n",3,'./log/stock.log');
 	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Syntax Error : '.$argv[0].
-			" CSVFile BlockCSVFile\n");
+			" CSVFile\n");
 	exit;
 }
 if(!file_exists($argv[1]))
@@ -504,28 +522,20 @@ if(!file_exists($argv[1]))
 	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' CSVFile not exists : '.$argv[1]."\n");
 	exit;
 }
-if(!file_exists($argv[2]))
-{
-	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' BlockCSVFile not exists : '.$argv[1]."\n",3,'./log/stock.log');
-	error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' BlockCSVFile not exists : '.$argv[1]."\n");
-	exit;
-}
+
 $checkFile = $argv[1];
-$blockFile = $argv[2];
-$Datas = file($blockFile,FILE_IGNORE_NEW_LINES);
 $BlockData = array();
 //永久黑名單
-foreach($Datas as $line)
-{
-	$keywords = preg_split("/,/",$line);
-	$BlockData[$keywords[0]] = $keywords[1];
-}
+$BlockStockArray = getBlockStock($ini_array['DB']);
+foreach($BlockStockArray as $item)
+	$BlockData[$item->stock_id] = 1;
+unset($BlockStockArray);
 //加入每日黑名單
 $DailyBlockStockArray = getDailyBlockStock($ini_array['DB']);
 foreach($DailyBlockStockArray as $item)
-{
 	$BlockData[$item->stock_id] = 1;
-}
+unset($DailyBlockStockArray);
+
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n",3,'./log/stock.log');
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n");
 Perform90Days($ini_array['DB']);
@@ -539,8 +549,8 @@ foreach($resData as $i=>$line)
 	else if($keywords[0] == '$TWT17') $keywords[0] = 't17';
 	if(isset($BlockData[$keywords[0]]))
 	{
-		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Block ' . $keywords[0] . "\n",3,'./log/stock.log');
-		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Block ' . $keywords[0] . "\n");
+		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n",3,'./log/stock.log');
+		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n");
 		continue;
 	}
         TextIntoDB($ini_array['DB'],$keywords[0]);
