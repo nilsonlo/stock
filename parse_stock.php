@@ -533,7 +533,7 @@ unset($BlockStockArray);
 //加入每日黑名單
 $DailyBlockStockArray = getDailyBlockStock($ini_array['DB']);
 foreach($DailyBlockStockArray as $item)
-	$BlockData[$item->stock_id] = 1;
+	$BlockData[$item->stock_id] = 2;
 unset($DailyBlockStockArray);
 
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n",3,'./log/stock.log');
@@ -549,8 +549,16 @@ foreach($resData as $i=>$line)
 	else if($keywords[0] == '$TWT17') $keywords[0] = 't17';
 	if(isset($BlockData[$keywords[0]]))
 	{
-		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n",3,'./log/stock.log');
-		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n");
+		if($BlockData[$keywords[0]] == 2)
+		{
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n",3,'./log/stock.log');
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n");
+		}
+		else
+		{
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "一次!\n",3,'./log/stock.log');
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "一次!\n");
+		}
 		continue;
 	}
         TextIntoDB($ini_array['DB'],$keywords[0]);
