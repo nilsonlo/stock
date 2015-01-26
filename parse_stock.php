@@ -551,13 +551,13 @@ foreach($resData as $i=>$line)
 	{
 		if($BlockData[$keywords[0]] == 2)
 		{
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n",3,'./log/stock.log');
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n");
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "一次!\n",3,'./log/stock.log');
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "一次!\n");
 		}
 		else
 		{
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "一次!\n",3,'./log/stock.log');
-			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "一次!\n");
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n",3,'./log/stock.log');
+			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n");
 		}
 		continue;
 	}
