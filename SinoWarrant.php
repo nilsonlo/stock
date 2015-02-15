@@ -36,11 +36,11 @@ class SinoWarrant {
 					$stock_type=1;
 				$url = "http://warrantchannel.sinotrade.com.tw/data/warrants/Get_wSearchResultScodes.aspx?ul=".
 					$stockItem['stock_id'] ."&histv=60";
-				$output = WebService::GetWebService($url,'getSinoWarrant.txt');
+				$output = WebService::GetWebService($url);
 				$outputArray = explode("|",$output);
 				$url = "http://warrantchannel.sinotrade.com.tw/data/warrants/Get_wSearchResultCont.aspx?wcodelist=".
 					$outputArray[0]."&ndays_sv=60";
-				$output = WebService::GetWebService($url,'getSinoWarrant.txt');
+				$output = WebService::GetWebService($url);
 				$warrantObj = json_decode($output);
 				foreach($warrantObj as $itemObj)
 				{

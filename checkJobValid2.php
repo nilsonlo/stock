@@ -139,7 +139,7 @@ error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n",3,'./log/valid.lo
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n");
 $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 	array( PDO::ATTR_PERSISTENT => false));
-$title = "證交所統計警示-Valid2";
+$title = "246-證交所統計警示-Valid2";
 $current_date = new DateTime();
 # 上市挑一間檢查
 $ret = CheckStockInfo($dbh,'2002',$days);

@@ -80,7 +80,7 @@ error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n",3,'./log/valid.lo
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n");
 $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 	array( PDO::ATTR_PERSISTENT => false));
-$title = "證交所抓取警示-HistoryData";
+$title = "246-證交所抓取警示-HistoryData";
 $current_date = new DateTime();
 # 上市指數檢查
 $ret = CheckHistoryIndexData($dbh,'t00',$days);

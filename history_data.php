@@ -34,8 +34,9 @@ if($p1->rowCount() !== 0)
 	die();
 }
 $url = 'http://www.twse.com.tw/ch/trading/exchange/MI_INDEX/MI_INDEX.php';
-$data = WebService::GetWebService($url,'twse_cookie.txt',array('download'=>'','qdate'=>$Year2.'/'.$Month.'/'.$Day,
-			'selectType'=>'ALLBUT0999'));
+$data = WebService::GetWebService($url,
+		array('download'=>'','qdate'=>$Year2.'/'.$Month.'/'.$Day,
+		'selectType'=>'ALLBUT0999'));
 #file_put_contents('1.html',$data);
 #exit;
 
