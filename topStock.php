@@ -7,14 +7,14 @@ $current_date = new DateTime();
 $qdate = $current_date->format('Y')-1911 . '/' . $current_date->format('m')
 		. '/' . $current_date->format('d');
 $days = $current_date->format('Ymd');
-$qdate = '104/02/13';
-$days = 20150213;
+#$qdate = '104/02/13';
+#$days = 20150213;
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n",3,'./log/top_stock.log');
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n");
 $url = "http://www.twse.com.tw/ch/trading/fund/T86/T86.php";
-#$output = WebService::GetWebService($url,array('input_date'=>$qdate,
-#		'select2'=>'ALLBUT0999','sorting'=>'by_issue','login_bt'=>''));
-$output = file_get_contents('1.txt');
+$output = WebService::GetWebService($url,array('input_date'=>$qdate,
+		'select2'=>'ALLBUT0999','sorting'=>'by_issue','login_bt'=>''));
+#$output = file_get_contents('1.txt');
 $qp_options = array(
 	'convert_from_encoding' => 'UTF-8',
 	'convert_to_encoding' => 'UTF-8',

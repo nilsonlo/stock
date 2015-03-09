@@ -6,13 +6,13 @@ $current_date = new DateTime();
 $qdate = $current_date->format('Y')-1911 . '/' . $current_date->format('m')
 		. '/' . $current_date->format('d');
 $days = $current_date->format('Ymd');
-$qdate = '104/02/13';
-$days = 20150213;
+#$qdate = '104/02/13';
+#$days = 20150213;
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n",3,'./log/top_stock.log');
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n");
 $url = "http://www.otc.org.tw/web/stock/3insti/daily_trade/3itrade_hedge_result.php?l=zh-tw&t=D&d=".$qdate;
-#$output = WebService::GetWebService($url);
-$output = file_get_contents('2.txt');
+$output = WebService::GetWebService($url);
+#$output = file_get_contents('2.txt');
 $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 	array( PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
 	PDO::ATTR_PERSISTENT => false));
@@ -33,7 +33,7 @@ $p3 = $dbh->prepare("insert into `top_data` (`code`,`name`,`stock_type`,`foreign
 	total_amount=:total_amount,self_rate=:self_rate,updated_at=now()");
 try {
 	#清除所有的歷史記錄
-	#$p1->execute();
+	$p1->execute();
 	$reportObj = json_decode($output);
 	foreach($reportObj->aaData as $item)
 	{

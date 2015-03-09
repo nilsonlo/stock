@@ -46,6 +46,7 @@ function ComputeStockAmount($dbh,$stock_id,$isIndex=false)
 {
 	$outputArray = array(
 			'lastamount'=>0,'lastprice'=>0,
+			'last_highprice'=>0,'last_lowprice'=>0,
 			'lastamount2'=>0,'lastprice2'=>0,
 			'lastamount3'=>0,'lastprice3'=>0,
 			'lastamount4'=>0,'lastprice4'=>0,
@@ -111,6 +112,8 @@ function ComputeStockAmount($dbh,$stock_id,$isIndex=false)
 					else
 						$outputArray['lastamount'] = intval($item['deal_amount']);
 					$outputArray['lastprice'] = $item['end_price'];
+					$outputArray['last_highprice'] = $item['highest_price'];
+					$outputArray['last_lowprice'] = $item['lowest_price'];
 					break;
 				case 1:	//前天
 					if(!$isIndex)
@@ -381,7 +384,8 @@ function TextIntoDB($dbh,$data)
 		$outputArray['stock_type'] = $item['stock_type'];
 		$p2 = $dbh->prepare("insert into `stock_no_warrant_info` (stock_id,
 			twse_stock_id,stock_type,
-			totalamount,lastamount,lastprice,lastamount2,lastprice2,
+			totalamount,lastamount,lastprice,last_highprice,
+			last_lowprice,lastamount2,lastprice2,
 			lastamount3,lastprice3,lastamount4,lastprice4,avgdays3amount,
 			days5,amount5,hp_days5,hprice5,lp_days5,lprice5,
 			days10,amount10,hp_days10,hprice10,lp_days10,lprice10,
@@ -402,7 +406,8 @@ function TextIntoDB($dbh,$data)
 			days85,amount85,hp_days85,hprice85,lp_days85,lprice85,
 			days90,amount90,hp_days90,hprice90,lp_days90,lprice90,
 			updated_at) values (:stock_id,:twse_stock_id,:stock_type,
-			:totalamount,:lastamount,:lastprice,:lastamount2,:lastprice2,
+			:totalamount,:lastamount,:lastprice,:last_highprice,
+			:last_lowprice,:lastamount2,:lastprice2,
 			:lastamount3,:lastprice3,:lastamount4,:lastprice4,:avgdays3amount,
 			:days5,:amount5,:hp_days5,:hprice5,:lp_days5,:lprice5,
 			:days10,:amount10,:hp_days10,:hprice10,:lp_days10,:lprice10,
@@ -425,6 +430,7 @@ function TextIntoDB($dbh,$data)
 			now()) on duplicate key update
 			twse_stock_id=:twse_stock_id,stock_type=:stock_type,
 			totalamount=:totalamount,lastamount=:lastamount,lastprice=:lastprice,
+			last_highprice=:last_highprice,last_lowprice=:last_lowprice,
 			lastamount2=:lastamount2,lastprice2=:lastprice2,
 			lastamount3=:lastamount3,lastprice3=:lastprice3,
 			lastamount4=:lastamount4,lastprice4=:lastprice4,avgdays3amount=:avgdays3amount,
