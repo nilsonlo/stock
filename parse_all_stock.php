@@ -19,8 +19,8 @@ function GetBanishStock($dbh)
 	try {
                 # 錯誤的話, 就不做了
                 $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
-		# 找出所有的記錄
-		$p1 = $dbh->prepare("select stock_id from `stock_info` where stock_type!=0");
+		# 找出所有黑名單的記錄
+		$p1 = $dbh->prepare("select stock_id from `block_stock`");
 		$p1->execute();
 		return $p1->fetchAll(PDO::FETCH_COLUMN|PDO::FETCH_GROUP,0);
 	} catch (PDOException $e) {
@@ -28,13 +28,13 @@ function GetBanishStock($dbh)
 		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Error : ('.$e->getLine().') '.$e->getMessage()."\n");
 	}
 }
-function DeleteStockNoWarrantInfo($dbh)
+function DeleteAllStockInfo($dbh)
 {
 	try {
                 # 錯誤的話, 就不做了
                 $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
 		# 找出所有的記錄
-		$p1 = $dbh->prepare("delete from `stock_no_warrant_info`");
+		$p1 = $dbh->prepare("delete from `all_stock_info`");
 		$p1->execute();
 	} catch (PDOException $e) {
 		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Error : ('.$e->getLine().') '.$e->getMessage()."\n",3,'./log/stock.log');
@@ -382,7 +382,7 @@ function TextIntoDB($dbh,$data)
 		$outputArray['lastprice'] = $item['end_price'];
 		$outputArray['twse_stock_id'] = $twse_stock_id;
 		$outputArray['stock_type'] = $item['stock_type'];
-		$p2 = $dbh->prepare("insert into `stock_no_warrant_info` (stock_id,
+		$p2 = $dbh->prepare("insert into `all_stock_info` (stock_id,
 			twse_stock_id,stock_type,
 			totalamount,lastamount,lastprice,last_highprice,
 			last_lowprice,lastamount2,lastprice2,
@@ -468,7 +468,7 @@ error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n");
 $DB = $ini_array['DB'];
 $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 	array( PDO::ATTR_PERSISTENT => true ));
-DeleteStockNoWarrantInfo($dbh);
+DeleteAllStockInfo($dbh);
 $stockArray = GetAllStock($dbh);
 $banishStockArray = GetBanishStock($dbh);
 foreach($stockArray as $stock)

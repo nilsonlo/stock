@@ -5,5 +5,5 @@ days_ago()
 }
 `./parse_stock.php ./stock.csv`;
 `./getHistBid.php`;
-`./parse_stock_no_warrant.php`;
+`./parse_all_stock.php`;
 `./checkJobValid2.php $(days_ago 0)`;
