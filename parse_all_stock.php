@@ -50,7 +50,7 @@ function ComputeStockAmount($dbh,$stock_id,$isIndex=false)
 			'lastamount2'=>0,'lastprice2'=>0,
 			'lastamount3'=>0,'lastprice3'=>0,
 			'lastamount4'=>0,'lastprice4'=>0,
-			'avgdays3amount'=>0,
+			'avgdays3amount'=>0,'avg20days_price'=>0,
 			'days5'=>0,'amount5'=>0,'hp_days5'=>0,'hprice5'=>0,'lp_days5'=>0,'lprice5'=>0,
 			'days10'=>0,'amount10'=>0,'hp_days10'=>0,'hprice10'=>0,'lp_days10'=>0,'lprice10'=>0,
 			'days15'=>0,'amount15'=>0,'hp_days15'=>0,'hprice15'=>0,'lp_days15'=>0,'lprice15'=>0,
@@ -80,7 +80,7 @@ function ComputeStockAmount($dbh,$stock_id,$isIndex=false)
 		$output = array('days'=>0,'amount'=>0,
 				'hdays'=>0,'high_price'=>0,
 				'ldays'=>0,'low_price'=>999999,
-				'avg_amount'=>0);
+				'avg_amount'=>0,'avg_price'=>0);
 			
 		foreach($resData as $i=>$item)
 		{
@@ -103,6 +103,8 @@ function ComputeStockAmount($dbh,$stock_id,$isIndex=false)
 			{
 				$output['avg_amount'] += intval($item['deal_amount']);
 			}
+
+			$output['avg_price'] += floatval($item['end_price']);
 
 			switch($i)
 			{
@@ -181,6 +183,8 @@ function ComputeStockAmount($dbh,$stock_id,$isIndex=false)
 					$outputArray['hprice20'] = $output['high_price'];
 					$outputArray['lp_days20'] = $output['ldays'];
 					$outputArray['lprice20'] = $output['low_price'];
+					//取得20日均價
+					$outputArray['avg20days_price'] = floatval($output['avg_price']/($i+1));
 					break;
 				case 24:
 					$outputArray['days25'] = $output['days'];
@@ -386,7 +390,7 @@ function TextIntoDB($dbh,$data)
 			twse_stock_id,stock_type,
 			totalamount,lastamount,lastprice,last_highprice,
 			last_lowprice,lastamount2,lastprice2,
-			lastamount3,lastprice3,lastamount4,lastprice4,avgdays3amount,
+			lastamount3,lastprice3,lastamount4,lastprice4,avgdays3amount,avg20days_price,
 			days5,amount5,hp_days5,hprice5,lp_days5,lprice5,
 			days10,amount10,hp_days10,hprice10,lp_days10,lprice10,
 			days15,amount15,hp_days15,hprice15,lp_days15,lprice15,
@@ -408,7 +412,7 @@ function TextIntoDB($dbh,$data)
 			updated_at) values (:stock_id,:twse_stock_id,:stock_type,
 			:totalamount,:lastamount,:lastprice,:last_highprice,
 			:last_lowprice,:lastamount2,:lastprice2,
-			:lastamount3,:lastprice3,:lastamount4,:lastprice4,:avgdays3amount,
+			:lastamount3,:lastprice3,:lastamount4,:lastprice4,:avgdays3amount,:avg20days_price,
 			:days5,:amount5,:hp_days5,:hprice5,:lp_days5,:lprice5,
 			:days10,:amount10,:hp_days10,:hprice10,:lp_days10,:lprice10,
 			:days15,:amount15,:hp_days15,:hprice15,:lp_days15,:lprice15,
@@ -433,7 +437,7 @@ function TextIntoDB($dbh,$data)
 			last_highprice=:last_highprice,last_lowprice=:last_lowprice,
 			lastamount2=:lastamount2,lastprice2=:lastprice2,
 			lastamount3=:lastamount3,lastprice3=:lastprice3,
-			lastamount4=:lastamount4,lastprice4=:lastprice4,avgdays3amount=:avgdays3amount,
+			lastamount4=:lastamount4,lastprice4=:lastprice4,avgdays3amount=:avgdays3amount,avg20days_price=:avg20days_price,
 			days5=:days5,amount5=:amount5,hp_days5=:hp_days5,hprice5=:hprice5,lp_days5=:lp_days5,lprice5=:lprice5,
 			days10=:days10,amount10=:amount10,hp_days10=:hp_days10,hprice10=:hprice10,lp_days10=:lp_days10,lprice10=:lprice10,
 			days15=:days15,amount15=:amount15,hp_days15=:hp_days15,hprice15=:hprice15,lp_days15=:lp_days15,lprice15=:lprice15,
@@ -468,6 +472,7 @@ error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n");
 $DB = $ini_array['DB'];
 $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 	array( PDO::ATTR_PERSISTENT => true ));
+# 清空股票資訊
 DeleteAllStockInfo($dbh);
 $stockArray = GetAllStock($dbh);
 $banishStockArray = GetBanishStock($dbh);

@@ -346,7 +346,7 @@ function ComputeStockAmount($DB,$stock_id,$isIndex=false)
 	return $outputArray;
 }
 
-function TextIntoDB($DB,$data)
+function TextIntoDB($DB,$data,$isBlock=false)
 {
         try {
                 $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
@@ -364,6 +364,7 @@ function TextIntoDB($DB,$data)
 		}
 		$item = $p->fetch(PDO::FETCH_ASSOC);
 		$isIndex = (intval($item['stock_type']) === 0)?true:false;
+		
 		$outputArray = ComputeStockAmount($DB,$item['stock_id'],$isIndex);
 		switch($item['stock_type'])
 		{
@@ -375,7 +376,8 @@ function TextIntoDB($DB,$data)
 				$twse_stock_id = 'otc_'.$item['stock_id'].'.tw';
 				break;
 		}
-					
+	
+		$outputArray['block_flag'] = ($isBlock===true)?1:0;
 		$outputArray['stock_id'] = $item['stock_id'];
 		$outputArray['totalamount'] = $item['totalamount'];
 		$outputArray['twse_stock_id'] = $twse_stock_id;
@@ -403,7 +405,7 @@ function TextIntoDB($DB,$data)
 			days80,amount80,hp_days80,hprice80,lp_days80,lprice80,
 			days85,amount85,hp_days85,hprice85,lp_days85,lprice85,
 			days90,amount90,hp_days90,hprice90,lp_days90,lprice90,
-			updated_at) values (:stock_id,:twse_stock_id,:stock_type,
+			block_flag,updated_at) values (:stock_id,:twse_stock_id,:stock_type,
 			:totalamount,:lastamount,:lastprice,:last_highprice,
 			:last_lowprice,:lastamount2,:lastprice2,
 			:lastamount3,:lastprice3,:lastamount4,:lastprice4,:avgdays3amount,
@@ -425,7 +427,7 @@ function TextIntoDB($DB,$data)
 			:days80,:amount80,:hp_days80,:hprice80,:lp_days80,:lprice80,
 			:days85,:amount85,:hp_days85,:hprice85,:lp_days85,:lprice85,
 			:days90,:amount90,:hp_days90,:hprice90,:lp_days90,:lprice90,
-			now()) on duplicate key update
+			:block_flag,now()) on duplicate key update
 			twse_stock_id=:twse_stock_id,stock_type=:stock_type,
 			totalamount=:totalamount,lastamount=:lastamount,lastprice=:lastprice,
 			last_highprice=:last_highprice,last_lowprice=:last_lowprice,
@@ -450,7 +452,7 @@ function TextIntoDB($DB,$data)
 			days80=:days80,amount80=:amount80,hp_days80=:hp_days80,hprice80=:hprice80,lp_days80=:lp_days80,lprice80=:lprice80,
 			days85=:days85,amount85=:amount85,hp_days85=:hp_days85,hprice85=:hprice85,lp_days85=:lp_days85,lprice85=:lprice85,
 			days90=:days90,amount90=:amount90,hp_days90=:hp_days90,hprice90=:hprice90,lp_days90=:lp_days90,lprice90=:lprice90,
-			updated_at=now()");
+			block_flag=:block_flag,updated_at=now()");
 	
 		$p2->execute($outputArray);
         } catch (PDOException $e) {
@@ -544,7 +546,9 @@ unset($DailyBlockStockArray);
 
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n",3,'./log/stock.log');
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Start'."\n");
+# 維持只保留90天內的交易資訊
 Perform90Days($ini_array['DB']);
+# 清除所有的股票
 DeleteAllStockInfo($ini_array['DB']);
 $resData = file($checkFile,FILE_IGNORE_NEW_LINES);
 foreach($resData as $i=>$line)
@@ -565,9 +569,10 @@ foreach($resData as $i=>$line)
 			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n",3,'./log/stock.log');
 			error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' 阻擋掉 ' . $keywords[0] . "\n");
 		}
-		continue;
+		TextIntoDB($ini_array['DB'],$keywords[0],true);
 	}
-        TextIntoDB($ini_array['DB'],$keywords[0]);
+	else
+        	TextIntoDB($ini_array['DB'],$keywords[0]);
 //	if($i==1) break;
 }
 deleteDailyBlockStock($ini_array['DB']);
