@@ -27,10 +27,12 @@ $p = $dbh->prepare("insert into `history_data` (`days`,`stock_id`,`stock_name`,`
 		:start_price,:highest_price,:lowest_price,:end_price,0,now()) on duplicate key update
 		stock_name=:stock_name,deal_amount=:deal_amount,start_price=:start_price,highest_price=:highest_price,
 		lowest_price=:lowest_price,end_price=:end_price,created_at=now()");
-
-$url = 'http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch='.implode($INDEX_STOCK_ARRAY,"|").'|&json=1&delay=0';
-$data = file_get_contents($url);
-$dataObject = json_decode($data);
+$d = new DateTime();
+$mil = $d->getTimestamp() * 1000 + rand(0,1000);
+$msg = WebService::GetTWSEService('http://mis.twse.com.tw/stock/index.jsp');
+$url = 'http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch='.implode($INDEX_STOCK_ARRAY,"|").'|&json=1&delay=0&_='.$mil;
+$msg = WebService::GetTWSEService($url);
+$dataObject = json_decode($msg);
 if(isset($dataObject->msgArray))
 {
 	foreach($dataObject->msgArray as $stock)
