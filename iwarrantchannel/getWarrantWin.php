@@ -28,14 +28,14 @@ function GetWebService($url,$postData = null)
 CheckLock($argv[0]);
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n",3,'./log/stock.log');
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n");
-$code='2002';
+$code='0050';
 #$url = 'http://warrantchannel.sinotrade.com.tw/want/wSearch.aspx?';
 #GetWebService($url);
 #$url = "http://www.warrantwin.com.tw/wtsearch.aspx?sid=$code";
 #GetWebService($url);
 #$outputArray = explode("|",$output);
 $url = "https://www.warrantwin.com.tw/ws/NewWarSearch.aspx?showType=basic_123&p=CPCode,Derivative,Broker,Conver,Lever,S_BuyIV,E_BuyIV,Sp,Ep,S_Period,E_Period,BuySellRate,PageSize,PageNo,listCode,Amt,Vol&v=7,ALL,ALL,ALL,ALL,,,-10000,10000,,,ALL,8000,1,$code,ALL,ALL";
-$formData = array('sEcho'=>1,'iColumns'=>17,'sColumns'=>'','iDisplayStart'=>0,'iDisplayLength'=>200,
+$formData = array('sEcho'=>1,'iColumns'=>17,'sColumns'=>'','iDisplayStart'=>0,'iDisplayLength'=>500,
 			'mDataProp_0'=>0,'mDataProp_1'=>1,'mDataProp_2'=>2,'mDataProp_3'=>3,'mDataProp_4'=>4,
 			'mDataProp_5'=>5,'mDataProp_6'=>6,'mDataProp_7'=>7,'mDataProp_8'=>8,'mDataProp_9'=>9,
 			'mDataProp_10'=>10,'mDataProp_11'=>11,'mDataProp_12'=>12,'mDataProp_13'=>13,'mDataProp_14'=>14,
