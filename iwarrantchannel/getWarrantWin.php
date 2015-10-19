@@ -28,7 +28,7 @@ function GetWebService($url,$postData = null)
 CheckLock($argv[0]);
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n",3,'./log/stock.log');
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n");
-$code='0050';
+$code='3481';
 #$url = 'http://warrantchannel.sinotrade.com.tw/want/wSearch.aspx?';
 #GetWebService($url);
 #$url = "http://www.warrantwin.com.tw/wtsearch.aspx?sid=$code";

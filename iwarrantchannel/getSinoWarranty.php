@@ -21,8 +21,10 @@ function GetWebService($url)
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n",3,'./log/stock.log');
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n");
 $code='2002';
-#$url = 'http://warrantchannel.sinotrade.com.tw/want/wSearch.aspx?';
-#GetWebService($url);
+$url = "http://warrantchannel.sinotrade.com.tw/want/wHistBidIV.aspx?";
+GetWebService($url);
+$url = "http://warrant.sinotrade.com.tw/warrant2010/json_biv.jsp?ul=".$code."&callback=jsonp";
+echo GetWebService($url);
 $url = "http://warrantchannel.sinotrade.com.tw/data/warrants/Get_wSearchResultScodes.aspx?ul=$code&histv=60";
 $output = GetWebService($url);
 $outputArray = explode("|",$output);

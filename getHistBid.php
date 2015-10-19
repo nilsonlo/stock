@@ -42,6 +42,9 @@ error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n");
 $current_date = new DateTime();
 try
 {
+	$url = "http://warrantchannel.sinotrade.com.tw/want/wHistBidIV.aspx?";
+	GetWebService($url);	//Get Cookie
+
 	$dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 			array( PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
 				PDO::ATTR_PERSISTENT => false));
@@ -66,11 +69,17 @@ try
 	{
 		if($stockItem['stock_type'] == '0') continue;
 		$stock_type = $stockItem['stock_type'];
-
 		$url = "http://warrant.sinotrade.com.tw/warrant2010/json_biv.jsp?ul=".$stockItem['stock_id']."&callback=jsonp";
 		$output = GetWebService($url);
 		$output = preg_replace('/jsonp\(|\);/','',$output);
 		$warrant_data = json_decode($output);
+		if(!property_exists($warrant_data,'wants'))
+		{
+			var_dump($warrant_data);
+			error_log('getHistBid: '.$stockItem['stock_id']." Failed!\n");
+			break;
+			//continue;
+		}
 		foreach($warrant_data->wants as $item)
 		{
 			if(strpos($item->s,"P") === false)
@@ -141,7 +150,7 @@ try
 		}	//End of foreach
 	}	//End of foreach
 	//Clean the warrant day = 0
-	$p4 = $dbh->prepare("delete from warrant_data where updated_at!=:days and warrant_days=0");
+	$p4 = $dbh->prepare("delete from warrant_data where updated_at!=:days or updated_at is null");
 	$days = $current_date->format('Ymd');
 	$p4->bindParam(':days',$days,PDO::PARAM_STR);
 	$p4->execute();
