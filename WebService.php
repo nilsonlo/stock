@@ -23,7 +23,7 @@ class WebService {
 		$ret = curl_exec($ch);
 		return $ret;
 	}
-	public static function GetTWSEService($url,$clean_cookie=false,$cookie=null,$postData=null)
+	public static function GetTWSEService($url,$clean_cookie=false,$postData=null)
 	{
 		$cookie_file = __DIR__ . '/tcookie.txt';
 		if($clean_cookie === true && file_exists($cookie_file))
@@ -33,17 +33,15 @@ class WebService {
 		curl_setopt($ch, CURLOPT_URL, $url );
 		curl_setopt($ch, CURLOPT_COOKIEJAR , $cookie_file);
 		curl_setopt($ch, CURLOPT_COOKIEFILE, $cookie_file);
-		if(is_null($cookie))
-			curl_setopt($ch,CURLOPT_COOKIE,$cookie);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE );
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE );
 		curl_setopt($ch, CURLOPT_VERBOSE,1);
+		curl_setopt($ch, CURLOPT_ENCODING , "gzip");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			"User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.124 Safari/537.36",
 			"Accept: application/json, text/javascript, */*; q=0.01",
 			"Accept-Language: zh-TW,zh;q=0.8,en-US;q=0.6,en;q=0.4,ja;q=0.2",
-			"Accept-Encoding: gzip, deflate",
-//			"Connection: keep-alive",
+			"Accept-Encoding: gzip",
 			"X-Requested-With: XMLHttpRequest"
 			));
 
@@ -56,6 +54,10 @@ class WebService {
 			curl_setopt($ch,CURLOPT_POSTFIELDS,http_build_query($postData));
 		}
 		$ret = curl_exec($ch);
-		return $ret;
+		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if($code != 200)
+			return array(false,null);
+		else
+			return array(true,$ret);
 	}
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/php -q
 <?php
 #上市指數的抓取
-require_once('./auto_load.php');
+require_once('../auto_load.php');
 if($argc != 2)
 	die('Syntax : '.$argv[0].' yyyy-mm-dd'."\n");
 try {
@@ -15,6 +15,10 @@ $INDEX_STOCK_ARRAY = array('t00'=>'tse_t00.tw_'.$days,
 			't13'=>'tse_t13.tw_'.$days,
 			't17'=>'tse_t17.tw_'.$days,
 			);
+//$INDEX_STOCK_ARRAY = array('t00'=>'tse_t00.tw',
+//			't13'=>'tse_t13.tw',
+//			't17'=>'tse_t17.tw',
+//			);
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n",3,'./log/stock.log');
 error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ . ' Start'."\n");
 $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
@@ -31,6 +35,7 @@ $d = new DateTime();
 $mil = $d->getTimestamp() * 1000 + rand(0,1000);
 $msg = WebService::GetTWSEService('http://mis.twse.com.tw/stock/index.jsp',true);
 $url = 'http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch='.implode($INDEX_STOCK_ARRAY,"|").'|&json=1&delay=0&_='.$mil;
+#$url = 'http://mis.twse.com.tw/stock/api/getStock.jsp?ch='.implode($INDEX_STOCK_ARRAY,"|").'|&json=1&_='.$mil;
 $msg = WebService::GetTWSEService($url);
 $dataObject = json_decode($msg);
 if(isset($dataObject->msgArray))
