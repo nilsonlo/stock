@@ -6,21 +6,29 @@ function GetCheatStock($dbh)
                 # 錯誤的話, 就不做了
                 $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
 		# 找出所有的記錄
-		# 1. 市值300億以下
-		# 2. 權證收盤價在0.8以上，達8支
-		# 3. 股價150元以下
+		# 1. 市值350億以下
+		# 2. 權證收盤價在0.6以上，達7支
+		# 3. 股價10~27元、50~55元、100~270元
 		# 4. 代碼扣除0開頭的
-		$p1 = $dbh->prepare("select * from `stock_info` where lastprice*totalamount <= 35000000000
-				and lastprice <= 150 and stock_type != 0");
-		$p2 = $dbh->prepare("select * from warrant_data where stock_id=:stock_id and warrant_price >= 0.8");
+		# 5. 股本沒抓到的就忽略
+		$p1 = $dbh->prepare("select * from `stock_info` where lastprice*totalamount <= 35000000000 and stock_type !=0
+				and lastprice >= 10 and lastprice <= 270");
+		$p2 = $dbh->prepare("select * from warrant_data where stock_id=:stock_id and warrant_price >= 0.6");
 		$p1->execute();
 		$items = $p1->fetchAll(PDO::FETCH_ASSOC);
 		$newArray = [];
 		foreach($items as $item)
 		{
 			if(preg_match('/^0/',$item['stock_id'])) continue;
+			if($item['totalamount'] == 0) continue;
+			//10以下不要
+			if(intval($item['lastprice']) < 10) continue;
+			//28~49 不要
+			if(intval($item['lastprice']) >= 28 && intval($item['lastprice']) < 50) continue;
+			//56~99 不要
+			if(intval($item['lastprice']) >= 56 && intval($item['lastprice']) < 100) continue;
 			$p2->execute(array('stock_id'=>$item['stock_id']));
-			if($p2->rowCount() < 8) continue;
+			if($p2->rowCount() < 7) continue;
 			$newArray[] = $item;
 		}
 		return $newArray;

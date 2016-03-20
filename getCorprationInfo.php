@@ -38,8 +38,8 @@ $p1 = $dbh->prepare("select stock_id,days from history_data where stock_id=:stoc
 $p2 = $dbh->prepare("update history_data set totalamount = :totalamount where days=:days and stock_id=:stock_id");
 
 $url="http://mops.twse.com.tw/mops/web/t51sb01";
-//上市 sii
-//上櫃 otc
+//type 上市 sii
+//type 上櫃 otc
 GetWebService($url);
 $output = GetWebService("http://mops.twse.com.tw/mops/web/ajax_t51sb01",
 	array('encodeURIComponent'=>1,'step'=>1,

@@ -352,8 +352,8 @@ function TextIntoDB($DB,$data,$isBlock=false)
                 $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
                         array( PDO::ATTR_PERSISTENT => false));
                 # 錯誤的話, 就不做了
-        //      $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
-                $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
+	//      $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
+		$dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
 		$p = $dbh->prepare("select * from history_data where stock_id = ? order by days desc limit 1");
                 $p->execute(array($data));
 		if($p->rowCount() === 0)
