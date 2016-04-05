@@ -11,25 +11,38 @@ function GetCheatStock($dbh)
 		# 3. 股價10~27元、50~55元、100~270元
 		# 4. 代碼扣除0開頭的
 		# 5. 股本沒抓到的就忽略
+		# 6. 前一日有買進的就要列入
 		$p1 = $dbh->prepare("select * from `stock_info` where lastprice*totalamount <= 35000000000 and stock_type !=0
 				and lastprice >= 10 and lastprice <= 270");
 		$p2 = $dbh->prepare("select * from warrant_data where stock_id=:stock_id and warrant_price >= 0.6");
+		$p3 = $dbh->prepare("select stock_id from daily_buyin_stock where stock_id=:stock_id");
 		$p1->execute();
 		$items = $p1->fetchAll(PDO::FETCH_ASSOC);
 		$newArray = [];
 		foreach($items as $item)
 		{
 			if(preg_match('/^0/',$item['stock_id'])) continue;
-			if($item['totalamount'] == 0) continue;
-			//10以下不要
-			if(intval($item['lastprice']) < 10) continue;
-			//28~49 不要
-			if(intval($item['lastprice']) >= 28 && intval($item['lastprice']) < 50) continue;
-			//56~99 不要
-			if(intval($item['lastprice']) >= 56 && intval($item['lastprice']) < 100) continue;
-			$p2->execute(array('stock_id'=>$item['stock_id']));
-			if($p2->rowCount() < 7) continue;
-			$newArray[] = $item;
+			$p3->execute(array('stock_id'=>$item['stock_id']));
+			if($p3->rowCount() === 1)
+			{
+				$newArray[] = $item;
+				error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ ." $item['stock_id'] 有庫存, 強制列入\n",3,'./log_stock.log');
+				error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ ." $item['stock_id'] 有庫存, 強制列入\n");
+				continue;
+			}
+			else
+			{
+				if($item['totalamount'] == 0) continue;
+				//10以下不要
+				if(intval($item['lastprice']) < 10) continue;
+				//28~49 不要
+				if(intval($item['lastprice']) >= 28 && intval($item['lastprice']) < 50) continue;
+				//56~99 不要
+				if(intval($item['lastprice']) >= 56 && intval($item['lastprice']) < 100) continue;
+				$p2->execute(array('stock_id'=>$item['stock_id']));
+				if($p2->rowCount() < 7) continue;
+				$newArray[] = $item;
+			}
 		}
 		return $newArray;
 	} catch (PDOException $e) {
@@ -59,6 +72,21 @@ function DeleteCheatStockInfo($dbh)
                 $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
 		# 找出所有的記錄
 		$p1 = $dbh->prepare("delete from `cheat_info`");
+		$p1->execute();
+	} catch (PDOException $e) {
+		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Error : ('.$e->getLine().') '.$e->getMessage()."\n",3,'./log/stock.log');
+		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Error : ('.$e->getLine().') '.$e->getMessage()."\n");
+	}
+}
+
+
+function DeleteDailyBuyinStockInfo($dbh)
+{
+	try {
+                # 錯誤的話, 就不做了
+                $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_WARNING);
+		# 找出所有的記錄
+		$p1 = $dbh->prepare("delete from `daily_buyin_stock`");
 		$p1->execute();
 	} catch (PDOException $e) {
 		error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ .' Error : ('.$e->getLine().') '.$e->getMessage()."\n",3,'./log/stock.log');
@@ -161,6 +189,8 @@ $dbh = new PDO($DB['DSN'],$DB['DB_USER'], $DB['DB_PWD'],
 # 清空股票資訊
 DeleteCheatStockInfo($dbh);
 $stockArray = GetCheatStock($dbh);
+# 清空前一日有庫存的股票資訊
+DeleteDailyBuyinStockInfo($dbh);
 $banishStockArray = GetBanishStock($dbh);
 foreach($stockArray as $stock)
 {
