@@ -26,9 +26,8 @@ function GetCheatStock($dbh)
 			if($p3->rowCount() === 1)
 			{
 				$newArray[] = $item;
-				error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ ." $item['stock_id'] 有庫存, 強制列入\n",3,'./log_stock.log');
-				error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ ." $item['stock_id'] 有庫存, 強制列入\n");
-				continue;
+				error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ ." ".$item['stock_id']." 有庫存, 強制列入\n",3,'./log_stock.log');
+				error_log('['.date('Y-m-d H:i:s').'] '.__FILE__ ." ".$item['stock_id']." 有庫存, 強制列入\n");
 			}
 			else
 			{
